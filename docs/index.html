@@ -4,212 +4,424 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="description" content="Cosen — local-first, LLM-agnostic cost, observability, and security for AI products."/>
-  <title>Cosen — Cost, Observability, and Security for any model</title>
+  <title>Cosen | Enterprise AI Gateway</title>
   <style>
     :root {
-      --bg: #090d18;
-      --panel: #12182b;
-      --panel2: #171e34;
-      --ink: #e9eef8;
-      --mute: #8b95b3;
-      --line: #26304a;
-      --cost: #7dd3a0;
-      --obs: #7db3ff;
-      --sec: #f0b07a;
-      --accent: #2a66d8;
-      --accent-hover: #3b7af0;
+      --bg-base: #030712;
+      --bg-surface: #111827;
+      --bg-surface-hover: #1f2937;
+      --border: #374151;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --accent-blue: #3b82f6;
+      --accent-blue-hover: #2563eb;
+      --accent-teal: #10b981;
+      --accent-purple: #8b5cf6;
+      --accent-rose: #f43f5e;
+      --glow-blue: rgba(59, 130, 246, 0.15);
+      --glow-teal: rgba(16, 185, 129, 0.15);
+      --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     }
+
     * { box-sizing: border-box; }
-    html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.6; }
-    a { color: var(--obs); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    header { border-bottom: 1px solid var(--line); background: #0c1222; position: sticky; top: 0; z-index: 10; }
-    .nav { max-width: 1100px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
-    .brand { font-weight: 700; letter-spacing: .14em; font-size: 14px; }
-    .brand span { color: var(--mute); font-weight: 500; letter-spacing: 0; margin-left: 10px; }
-    .nav-links a { margin-left: 22px; font-size: 14px; color: var(--ink); }
-    .hero { text-align: center; padding: 80px 24px 60px; background: radial-gradient(1200px 600px at 50% -10%, #1a2450 0%, var(--bg) 55%); }
-    .hero h1 { font-size: 44px; margin: 0 0 14px; line-height: 1.15; }
-    .hero p { color: var(--mute); font-size: 18px; max-width: 640px; margin: 0 auto 30px; }
-    .cta { display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-    .btn { display: inline-block; padding: 12px 22px; border-radius: 10px; font-weight: 600; font-size: 15px; }
-    .btn-primary { background: var(--accent); color: white; }
-    .btn-primary:hover { background: var(--accent-hover); text-decoration: none; }
-    .btn-secondary { background: var(--panel2); color: var(--ink); border: 1px solid var(--line); }
-    .btn-secondary:hover { background: var(--panel); text-decoration: none; }
-    .section { max-width: 1100px; margin: 0 auto; padding: 60px 24px; }
-    .section h2 { font-size: 28px; margin: 0 0 14px; }
-    .section .lead { color: var(--mute); font-size: 16px; max-width: 700px; margin-bottom: 34px; }
-    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
-    .card h3 { margin: 0 0 10px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
-    .pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
-    .c { background: #163226; color: var(--cost); }
-    .o { background: #16243f; color: var(--obs); }
-    .s { background: #3a2a18; color: var(--sec); }
-    .card p { color: var(--mute); margin: 0; font-size: 14px; }
-    .codeblock { background: #0d1324; border: 1px solid var(--line); border-radius: 12px; padding: 18px 22px; overflow-x: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; color: #c9d4f0; }
-    .codeblock .comment { color: #6b7b9c; }
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
-    .feature-list { list-style: none; padding: 0; margin: 0; }
-    .feature-list li { padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--mute); display: flex; align-items: center; gap: 10px; }
-    .feature-list li strong { color: var(--ink); }
-    footer { border-top: 1px solid var(--line); background: #0c1222; padding: 34px 24px; text-align: center; color: var(--mute); font-size: 13px; }
-    @media (max-width: 800px) {
-      .cards { grid-template-columns: 1fr; }
-      .grid2 { grid-template-columns: 1fr; }
-      .hero h1 { font-size: 32px; }
+    
+    body { 
+      margin: 0; 
+      background-color: var(--bg-base); 
+      color: var(--text-main); 
+      font-family: var(--font-sans); 
+      line-height: 1.6; 
+      -webkit-font-smoothing: antialiased;
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+      background-attachment: fixed;
+    }
+
+    a { color: var(--accent-blue); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: #60a5fa; }
+
+    /* Header & Navigation */
+    header { 
+      position: fixed; 
+      top: 0; width: 100%; 
+      z-index: 50; 
+      background: rgba(3, 7, 18, 0.7); 
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .nav-container { 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      padding: 16px 24px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+    }
+    .brand { 
+      font-weight: 700; 
+      font-size: 18px; 
+      letter-spacing: 0.05em; 
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand svg { width: 24px; height: 24px; color: var(--accent-blue); }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+    .nav-links a:hover { color: var(--text-main); }
+    .nav-links .btn-nav { 
+      background: var(--text-main); 
+      color: var(--bg-base); 
+      padding: 8px 16px; 
+      border-radius: 6px; 
+    }
+    .nav-links .btn-nav:hover { background: #e5e7eb; color: var(--bg-base); }
+
+    /* Typography */
+    h1, h2, h3 { line-height: 1.2; margin: 0; }
+    .text-gradient {
+      background: linear-gradient(to right, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Hero Section */
+    .hero { 
+      padding: 160px 24px 80px; 
+      text-align: center; 
+      max-width: 900px; 
+      margin: 0 auto; 
+    }
+    .hero h1 { font-size: clamp(40px, 5vw, 64px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 24px; }
+    .hero p { font-size: 20px; color: var(--text-muted); margin-bottom: 40px; font-weight: 400; }
+    .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 15px;
+      transition: all 0.2s; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--accent-blue); color: white; box-shadow: 0 0 20px var(--glow-blue); }
+    .btn-primary:hover { background: var(--accent-blue-hover); transform: translateY(-1px); }
+    .btn-secondary { background: var(--bg-surface); color: var(--text-main); border-color: var(--border); }
+    .btn-secondary:hover { background: var(--bg-surface-hover); border-color: #4b5563; }
+
+    /* Infographic / Architecture Diagram */
+    .diagram-section { max-width: 1000px; margin: 0 auto 100px; padding: 0 24px; }
+    .diagram-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .diagram-container::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+    .diag-node {
+      background: var(--bg-base); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; text-align: center;
+      width: 220px; position: relative; z-index: 2;
+    }
+    .diag-node.core {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 30px var(--glow-blue);
+    }
+    .diag-node h4 { font-size: 16px; margin-bottom: 12px; font-weight: 600; }
+    .diag-list { list-style: none; padding: 0; margin: 0; text-align: left; font-size: 13px; color: var(--text-muted); }
+    .diag-list li { margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .diag-list li::before { content: '•'; color: var(--accent-blue); }
+    
+    .diag-arrow {
+      flex: 1; height: 2px; background: var(--border); position: relative;
+      margin: 0 15px; display: flex; align-items: center; justify-content: center;
+    }
+    .diag-arrow::after {
+      content: ''; position: absolute; right: -2px; top: -4px;
+      border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 6px solid var(--border);
+    }
+    .diag-label { position: absolute; top: -25px; font-size: 12px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; background: var(--bg-surface); padding: 0 8px; }
+
+    /* Features Grid */
+    .section { max-width: 1200px; margin: 0 auto 120px; padding: 0 24px; }
+    .section-header { text-align: center; margin-bottom: 60px; }
+    .section-header h2 { font-size: 36px; font-weight: 700; margin-bottom: 16px; }
+    .section-header p { font-size: 18px; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+    
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+    .feature-card {
+      background: rgba(17, 24, 39, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+      background: var(--bg-surface);
+      border-color: #4b5563;
+      transform: translateY(-4px);
+    }
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 24px;
+    }
+    .icon-cost { background: var(--glow-teal); color: var(--accent-teal); }
+    .icon-obs { background: var(--glow-blue); color: var(--accent-blue); }
+    .icon-sec { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+    .feature-card h3 { font-size: 20px; margin-bottom: 12px; }
+    .feature-card p { color: var(--text-muted); font-size: 15px; margin: 0; }
+
+    /* Code Windows */
+    .code-showcase { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+    .mac-window {
+      background: #0d1117; border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .mac-header {
+      background: #1f2937; padding: 12px 16px; display: flex; gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .mac-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #ff5f56; }
+    .dot-y { background: #ffbd2e; }
+    .dot-g { background: #27c93f; }
+    .mac-body { padding: 20px; font-family: var(--font-mono); font-size: 14px; overflow-x: auto; color: #e5e7eb; }
+    .token-comment { color: #6b7280; }
+    .token-keyword { color: #c678dd; }
+    .token-string { color: #98c379; }
+    .token-function { color: #61afef; }
+
+    /* Integrations */
+    .integrations { text-align: center; padding: 60px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: rgba(17, 24, 39, 0.3); margin-bottom: 100px; }
+    .integrations p { color: var(--text-muted); font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 32px; font-weight: 600; }
+    .logo-cloud { display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; opacity: 0.7; }
+    .logo-item { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
+    .logo-item svg { width: 28px; height: 28px; }
+
+    /* Footer */
+    footer { background: var(--bg-surface); padding: 48px 24px; border-top: 1px solid var(--border); }
+    .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
+    .footer-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+    .footer-brand svg { width: 20px; height: 20px; color: var(--accent-blue); }
+    .footer-text { color: var(--text-muted); font-size: 14px; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { color: var(--text-muted); font-size: 14px; }
+    .footer-links a:hover { color: var(--text-main); }
+
+    @media (max-width: 900px) {
+      .diagram-container { flex-direction: column; gap: 30px; padding: 30px 20px; }
+      .diag-arrow { width: 2px; height: 40px; margin: 10px 0; }
+      .diag-arrow::after { right: -4px; top: auto; bottom: -2px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid var(--border); }
+      .diag-label { top: 50%; left: 20px; transform: translateY(-50%); }
+      .code-showcase { grid-template-columns: 1fr; }
       .nav-links { display: none; }
     }
   </style>
 </head>
 <body>
+
   <header>
-    <div class="nav">
-      <div class="brand">COSEN <span>Cost · Observability · Security</span></div>
+    <div class="nav-container">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Cosen
+      </div>
       <nav class="nav-links">
         <a href="#features">Features</a>
-        <a href="#start">Start</a>
-        <a href="#why">Why</a>
-        <a href="#cursor">Cursor</a>
-        <a href="cli-integrations.html">CLI agents</a>
-        <a href="https://github.com/cosen-ai/cosen">GitHub</a>
+        <a href="#how-it-works">How it Works</a>
+        <a href="cli-integrations.html">CLI Agents</a>
+        <a href="https://github.com/cosen-ai/cosen" class="btn-nav">GitHub</a>
       </nav>
     </div>
   </header>
 
   <section class="hero">
-    <h1>Cost, observability, and security<br/>for any model.</h1>
-    <p>Cosen is a local-first, LLM-agnostic gateway. Host it on your laptop or a private VM. Point any OpenAI-compatible or Anthropic model at it. Every call is priced, traced, and scanned.</p>
-    <div class="cta">
-      <a class="btn btn-primary" href="#start">Get started in 5 minutes</a>
-      <a class="btn btn-secondary" href="https://github.com/cosen-ai/cosen">View on GitHub</a>
+    <h1>Control your <span class="text-gradient">AI surface area</span></h1>
+    <p>Cosen is an enterprise-grade, local-first gateway. Point any OpenAI-compatible or Anthropic model at it, and every call is automatically priced, traced, and scanned for security.</p>
+    <div class="hero-ctas">
+      <a href="#quickstart" class="btn btn-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Get Started
+      </a>
+      <a href="https://github.com/cosen-ai/cosen" class="btn btn-secondary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        View Source
+      </a>
+    </div>
+  </section>
+
+  <section class="diagram-section">
+    <div class="diagram-container">
+      <div class="diag-node">
+        <h4>Your Application</h4>
+        <ul class="diag-list">
+          <li>Python / Node SDKs</li>
+          <li>CLI Agents (Codex, Aider)</li>
+          <li>Cursor Editor (MCP)</li>
+        </ul>
+      </div>
+      
+      <div class="diag-arrow"><span class="diag-label">/v1/chat</span></div>
+      
+      <div class="diag-node core">
+        <h4>Cosen Gateway</h4>
+        <ul class="diag-list">
+          <li><span style="color:var(--accent-rose)">●</span> Security Scanners</li>
+          <li><span style="color:var(--accent-teal)">●</span> Budget Enforcement</li>
+          <li><span style="color:var(--accent-blue)">●</span> SQLite Trace Store</li>
+        </ul>
+      </div>
+
+      <div class="diag-arrow"><span class="diag-label">Proxy</span></div>
+      
+      <div class="diag-node">
+        <h4>LLM Providers</h4>
+        <ul class="diag-list">
+          <li>OpenAI / Anthropic</li>
+          <li>Local (Ollama, vLLM)</li>
+          <li>OpenRouter / Groq</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="integrations">
+    <p>Seamlessly integrates with your existing stack</p>
+    <div class="logo-cloud">
+      <div class="logo-item">OpenAI</div>
+      <div class="logo-item">Anthropic</div>
+      <div class="logo-item">Cursor</div>
+      <div class="logo-item">Ollama</div>
+      <div class="logo-item">Groq</div>
     </div>
   </section>
 
   <section id="features" class="section">
-    <h2>One suite, three jobs</h2>
-    <p class="lead">Most teams run three disconnected tools. Cosen runs them on the same request path so your data model stays consistent.</p>
-    <div class="cards">
-      <div class="card">
-        <h3><span class="pill c">Cost</span> Feature-level spend</h3>
-        <p>Token usage × model price, tagged by <code>feature</code>, <code>project</code>, and <code>user</code>. Set daily kill-switches before a runaway agent burns the budget.</p>
+    <div class="section-header">
+      <h2>One suite, three critical jobs</h2>
+      <p>Stop running disconnected tools. Cosen puts cost, observability, and security on the exact same request path.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon icon-cost">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </div>
+        <h3>Cost & Budgets</h3>
+        <p>Track token usage × model price, tagged by feature, project, and user. Set daily kill-switches to prevent runaway agents from burning your budget.</p>
       </div>
-      <div class="card">
-        <h3><span class="pill o">Observability</span> Traces & latency</h3>
-        <p>SQLite-backed trace store, local web dashboard, and CLI reports. See model mix, latency, and spend by feature without a SaaS account.</p>
+      <div class="feature-card">
+        <div class="feature-icon icon-obs">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+        </div>
+        <h3>Observability</h3>
+        <p>Zero-instrumentation tracing. View model mix, latency, and spend by feature in a local web dashboard or via CLI reports. No SaaS account required.</p>
       </div>
-      <div class="card">
-        <h3><span class="pill s">Security</span> On-path scanners</h3>
-        <p>Deterministic detection for secrets, PII, injection phrasing, jailbreak phrasing, and system-prompt leaks. No extra judge model required.</p>
+      <div class="feature-card">
+        <div class="feature-icon icon-sec">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
+        <h3>On-Path Security</h3>
+        <p>Deterministic scanners intercept requests and responses. Block or redact secrets, PII, prompt injections, and system-prompt leaks instantly.</p>
       </div>
     </div>
   </section>
 
-  <section id="start" class="section">
-    <h2>Five-minute start</h2>
-    <p class="lead">Install locally, run the mock model, and open the web app. No API key required.</p>
-    <div class="codeblock">
-      <span class="comment"># Clone the repo</span><br/>
-      git clone https://github.com/cosen-ai/cosen.git<br/>
-      cd cosen<br/><br/>
-      <span class="comment"># Install and run</span><br/>
-      python -m pip install -e .<br/>
-      cosen init<br/>
-      cosen demo<br/>
-      cosen serve --mock &nbsp;<span class="comment"># http://127.0.0.1:8080/</span>
-    </div>
-  </section>
-
-  <section id="why" class="section">
-    <div class="grid2">
+  <section id="how-it-works" class="section">
+    <div class="code-showcase">
       <div>
-        <h2>Why Cosen</h2>
-        <p class="lead">Built for teams that ship AI products, not another agent framework.</p>
-        <ul class="feature-list">
-          <li><strong>Model-agnostic</strong> — OpenAI-compatible + Anthropic adapters, no vendor SDK lock-in.</li>
-          <li><strong>Local-first</strong> — SQLite on disk, no ClickHouse, no cloud account.</li>
-          <li><strong>Deterministic security</strong> — block or redact on the request path.</li>
-          <li><strong>Product attribution</strong> — tag every call with project, feature, user, session.</li>
-          <li><strong>Open source</strong> — Apache-2.0, self-hostable, with optional Cloud/EE later.</li>
+        <h2>Drop-in Replacement</h2>
+        <p style="color: var(--text-muted); font-size: 18px; margin-bottom: 24px;">
+          Cosen speaks native OpenAI and Anthropic protocols. Just change your Base URL and add custom attribution headers.
+        </p>
+        <ul class="diag-list" style="font-size: 16px; margin-bottom: 32px;">
+          <li style="margin-bottom: 12px;"><strong>Model-agnostic:</strong> No vendor SDK lock-in.</li>
+          <li style="margin-bottom: 12px;"><strong>Local-first:</strong> SQLite on disk, no mandatory cloud.</li>
+          <li style="margin-bottom: 12px;"><strong>Product attribution:</strong> Tag calls with <code>X-COS-Feature</code>.</li>
         </ul>
+        <a href="cli-integrations.html" class="btn btn-secondary">View CLI Agent Integrations →</a>
       </div>
-      <div class="codeblock">
-        <span class="comment"># Point your OpenAI SDK at Cosen</span><br/>
-        from openai import OpenAI<br/><br/>
-        client = OpenAI(<br/>
-        &nbsp;&nbsp;base_url="http://127.0.0.1:8080/v1",<br/>
-        &nbsp;&nbsp;api_key="not-needed-in-mock"<br/>
-        )<br/><br/>
-        client.chat.completions.create(<br/>
-        &nbsp;&nbsp;model="gpt-4o-mini",<br/>
-        &nbsp;&nbsp;messages=[{"role": "user", "content": "hello"}],<br/>
-        &nbsp;&nbsp;extra_headers={<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;"X-COS-Feature": "support-bot",<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;"X-COS-Project": "acme"<br/>
-        &nbsp;&nbsp;}<br/>
-        )
+      <div class="mac-window">
+        <div class="mac-header">
+          <div class="mac-dot dot-r"></div>
+          <div class="mac-dot dot-y"></div>
+          <div class="mac-dot dot-g"></div>
+        </div>
+        <div class="mac-body">
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+<span class="token-comment"># 1. Point SDK at local Cosen gateway</span>
+client = <span class="token-function">OpenAI</span>(
+    base_url=<span class="token-string">"http://127.0.0.1:8080/v1"</span>,
+    api_key=<span class="token-string">"not-needed-in-mock"</span>
+)
+
+<span class="token-comment"># 2. Tag requests for cost tracking</span>
+response = client.chat.completions.<span class="token-function">create</span>(
+    model=<span class="token-string">"gpt-4o-mini"</span>,
+    messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"hello"</span>}],
+    extra_headers={
+        <span class="token-string">"X-COS-Feature"</span>: <span class="token-string">"support-bot"</span>,
+        <span class="token-string">"X-COS-Project"</span>: <span class="token-string">"acme-corp"</span>
+    }
+)
+        </div>
       </div>
     </div>
   </section>
 
-  <section id="cursor" class="section">
-    <div class="grid2">
-      <div class="codeblock">
-        <span class="comment">// Add to Cursor MCP settings</span><br/>
-        {<br/>
-        &nbsp;&nbsp;"mcpServers": {<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;"cosen": {<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"command": "cosen",<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"args": ["mcp"]<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;}<br/>
-        &nbsp;&nbsp;}<br/>
-        }
-      </div>
-      <div>
-        <h2>Works inside Cursor</h2>
-        <p class="lead">Add Cosen as an MCP server and let Cursor scan prompts, estimate costs, read local reports, and route chat calls through the gateway.</p>
-        <ul class="feature-list">
-          <li><strong>Security scan</strong> — check prompts and outputs for secrets or injection.</li>
-          <li><strong>Cost estimate</strong> — model + tokens = USD before you run.</li>
-          <li><strong>Local report</strong> — ask Cursor to summarize spend and findings.</li>
-          <li><strong>Gateway chat</strong> — talk to any connected provider through Cosen.</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <section id="cli" class="section">
-    <h2>Works with LLM CLI agents</h2>
-    <p class="lead">Codex, Claude CLI, aider, and the <code>llm</code> CLI can all route through Cosen.</p>
-    <div class="grid2">
-      <div class="codeblock">
-        <span class="comment"># Codex</span><br/>
-        export OPENAI_BASE_URL=http://127.0.0.1:8080/v1<br/>
-        codex "refactor this function"
-      </div>
-      <div class="codeblock">
-        <span class="comment"># Claude CLI</span><br/>
-        export ANTHROPIC_BASE_URL=http://127.0.0.1:8080/v1<br/>
-        claude "explain this code"
-      </div>
-    </div>
-    <p style="margin-top:18px"><a href="cli-integrations.html">See all CLI agent integrations →</a></p>
-  </section>
-
-  <section class="section" style="text-align:center">
+  <section id="quickstart" class="section" style="text-align:center; max-width: 800px;">
     <h2>Ready to self-host?</h2>
-    <p class="lead" style="margin:0 auto 24px">Get the code, run the mock server, and start tracing your first AI calls in minutes.</p>
-    <a class="btn btn-primary" href="https://github.com/cosen-ai/cosen">Go to GitHub</a>
+    <p style="color: var(--text-muted); font-size: 18px; margin-bottom: 40px;">Get the code, run the mock server, and start tracing your first AI calls in minutes.</p>
+    
+    <div class="mac-window" style="text-align: left; margin-bottom: 40px;">
+      <div class="mac-header">
+        <div class="mac-dot dot-r"></div>
+        <div class="mac-dot dot-y"></div>
+        <div class="mac-dot dot-g"></div>
+      </div>
+      <div class="mac-body">
+<span class="token-comment"># Clone and install</span>
+git clone https://github.com/cosen-ai/cosen.git
+cd cosen
+python -m pip install -e .
+
+<span class="token-comment"># Initialize policy and seed demo data</span>
+cosen init
+cosen demo
+
+<span class="token-comment"># Start the gateway + web UI</span>
+cosen serve --mock
+      </div>
+    </div>
+    
+    <a class="btn btn-primary" href="https://github.com/cosen-ai/cosen">View Documentation on GitHub</a>
   </section>
 
   <footer>
-    <p>Cosen is an open-source project by Cosen Labs. Licensed under Apache-2.0.</p>
-    <p>
-      <a href="https://github.com/cosen-ai/cosen">GitHub</a> ·
-      <a href="https://github.com/cosen-ai/cosen/blob/main/CLA.md">CLA</a> ·
-      <a href="https://github.com/cosen-ai/cosen/blob/main/CONTRIBUTING.md">Contributing</a>
-    </p>
+    <div class="footer-content">
+      <div class="footer-brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Cosen
+      </div>
+      <div class="footer-text">
+        An open-source project by Cosen Labs. Licensed under Apache-2.0.
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/cosen-ai/cosen">GitHub</a>
+        <a href="https://github.com/cosen-ai/cosen/blob/main/CLA.md">CLA</a>
+        <a href="https://github.com/cosen-ai/cosen/blob/main/CONTRIBUTING.md">Contributing</a>
+      </div>
+    </div>
   </footer>
+
 </body>
 </html>
