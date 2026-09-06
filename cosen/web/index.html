@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Cosen — Cost · Observability · Security</title>
+  <style>
+    :root {
+      --bg: #090d18;
+      --panel: #12182b;
+      --panel2: #171e34;
+      --ink: #e9eef8;
+      --mute: #8b95b3;
+      --line: #26304a;
+      --cost: #7dd3a0;
+      --obs: #7db3ff;
+      --sec: #f0b07a;
+      --bad: #f07178;
+      --ok: #7dd3a0;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
+      font-family: ui-sans-serif, system-ui, sans-serif; }
+    .shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100%; }
+    nav { border-right: 1px solid var(--line); padding: 22px 16px; background: #0c1222; }
+    .brand { letter-spacing: .14em; font-weight: 700; font-size: 13px; }
+    .brand span { display: block; color: var(--mute); letter-spacing: 0; font-weight: 500; font-size: 11px; margin-top: 6px; }
+    nav a { display: block; color: var(--ink); text-decoration: none; padding: 10px 12px; border-radius: 10px; margin-top: 6px; font-size: 14px; }
+    nav a:hover, nav a.active { background: var(--panel2); }
+    main { padding: 24px 28px 48px; }
+    h1 { font-size: 22px; margin: 0 0 6px; }
+    .sub { color: var(--mute); font-size: 13px; margin-bottom: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+    .label { color: var(--mute); font-size: 11px; text-transform: uppercase; letter-spacing: .12em; }
+    .value { font-size: 26px; margin-top: 8px; font-variant-numeric: tabular-nums; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--mute); font-weight: 600; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    input, select, textarea {
+      width: 100%; background: #0d1324; color: var(--ink); border: 1px solid var(--line);
+      border-radius: 10px; padding: 10px 12px; font: inherit;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    button {
+      background: #2a66d8; color: white; border: 0; border-radius: 10px;
+      padding: 10px 14px; font: inherit; cursor: pointer;
+    }
+    button.ghost { background: #1a2340; color: var(--ink); }
+    button.danger { background: #6b2a32; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; }
+    .c { background: #163226; color: var(--cost); }
+    .o { background: #16243f; color: var(--obs); }
+    .s { background: #3a2a18; color: var(--sec); }
+    .bad { background: #3a1820; color: var(--bad); }
+    .ok { background: #163226; color: var(--ok); }
+    .page { display: none; }
+    .page.on { display: block; }
+    .chat { background: #0d1324; border: 1px solid var(--line); border-radius: 12px; min-height: 280px; padding: 14px; white-space: pre-wrap; }
+    .muted { color: var(--mute); }
+    .formgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      nav { border-right: 0; border-bottom: 1px solid var(--line); }
+      .grid, .row2, .formgrid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <nav>
+      <div class="brand">Cosen<span>LLM-agnostic · local web app</span></div>
+      <a href="#overview" data-page="overview" class="active">Overview</a>
+      <a href="#playground" data-page="playground">Playground</a>
+      <a href="#traces" data-page="traces">Traces</a>
+      <a href="#security" data-page="security">Security</a>
+      <a href="#providers" data-page="providers">Providers</a>
+      <a href="#pricing" data-page="pricing">Pricing</a>
+    </nav>
+    <main>
+      <section id="overview" class="page on">
+        <h1>Overview</h1>
+        <div class="sub">Last 24 hours on this machine. Host Cosen locally; point any OpenAI-compatible or Anthropic model at it.</div>
+        <div class="grid" id="kpis"></div>
+        <div class="row2">
+          <div class="card"><div class="label">Spend by model</div><table id="by-model"></table></div>
+          <div class="card"><div class="label">Spend by feature</div><table id="by-feature"></table></div>
+        </div>
+      </section>
+
+      <section id="playground" class="page">
+        <h1>Playground</h1>
+        <div class="sub">Talk to any connected provider through Cosen. The same cost, trace, and security path as production.</div>
+        <div class="formgrid">
+          <label>Provider<select id="pg-provider"></select></label>
+          <label>Model<input id="pg-model" placeholder="gpt-4o-mini or claude-sonnet-4"/></label>
+          <label>Feature tag<input id="pg-feature" value="playground"/></label>
+          <label>Project<input id="pg-project" value="local"/></label>
+        </div>
+        <label style="display:block;margin-top:10px">Prompt<textarea id="pg-prompt">Explain how to keep an AI feature model-agnostic in one paragraph.</textarea></label>
+        <div class="actions">
+          <button id="pg-send">Send through Cosen</button>
+          <button class="ghost" id="pg-scan">Scan prompt only</button>
+        </div>
+        <div class="card" style="margin-top:12px"><div class="label">Response</div><div class="chat" id="pg-out" class="muted">No call yet.</div></div>
+      </section>
+
+      <section id="traces" class="page">
+        <h1>Traces</h1>
+        <div class="sub">Every gateway call lands here — mock, cloud, or local models.</div>
+        <div class="card"><table id="trace-table"></table></div>
+      </section>
+
+      <section id="security" class="page">
+        <h1>Security</h1>
+        <div class="sub">On-path scanners. No extra judge model required.</div>
+        <div class="row2">
+          <div class="card">
+            <div class="label">Paste text</div>
+            <textarea id="sec-text" placeholder="Prompt or model output"></textarea>
+            <div class="actions">
+              <select id="sec-side"><option value="input">input</option><option value="output">output</option></select>
+              <button id="sec-run">Scan</button>
+            </div>
+            <div id="sec-result" class="muted" style="margin-top:10px"></div>
+          </div>
+          <div class="card"><div class="label">Findings (24h)</div><table id="sec-table"></table></div>
+        </div>
+      </section>
+
+      <section id="providers" class="page">
+        <h1>Providers</h1>
+        <div class="sub">OpenAI-compatible or Anthropic base URLs. Keys stay in environment variables on this host.</div>
+        <div class="card"><table id="prov-table"></table></div>
+        <div class="card" style="margin-top:12px">
+          <div class="label">Add or update provider</div>
+          <div class="formgrid" style="margin-top:10px">
+            <input id="p-name" placeholder="name (ollama, groq, anthropic)"/>
+            <input id="p-url" placeholder="https://host/v1"/>
+            <input id="p-env" placeholder="API key env (OPENAI_API_KEY)"/>
+            <input id="p-model" placeholder="default model hint"/>
+          </div>
+          <div class="actions"><button id="p-save">Save provider</button></div>
+        </div>
+      </section>
+
+      <section id="pricing" class="page">
+        <h1>Pricing table</h1>
+        <div class="sub">Planning rates per 1M tokens. Local / self-hosted models can be $0.</div>
+        <div class="card"><table id="price-table"></table></div>
+      </section>
+    </main>
+  </div>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const pages = document.querySelectorAll(".page");
+    const links = document.querySelectorAll("nav a");
+
+    function show(name) {
+      pages.forEach((p) => p.classList.toggle("on", p.id === name));
+      links.forEach((a) => a.classList.toggle("active", a.dataset.page === name));
+    }
+    window.addEventListener("hashchange", () => show((location.hash || "#overview").slice(1)));
+    show((location.hash || "#overview").slice(1));
+
+    function money(v) { return "$" + Number(v || 0).toFixed(4); }
+    function esc(v) { return String(v ?? "—").replace(/[&<>]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+    function table(el, headers, rows) {
+      if (!rows.length) {
+        el.innerHTML = "<tr><td class='muted'>No data yet.</td></tr>";
+        return;
+      }
+      el.innerHTML = "<thead><tr>" + headers.map((h) => `<th>${h}</th>`).join("") + "</tr></thead><tbody>" +
+        rows.map((r) => "<tr>" + r.map((c) => `<td>${c}</td>`).join("") + "</tr>").join("") + "</tbody>";
+    }
+
+    async function loadSummary() {
+      const data = await (await fetch("/api/summary?hours=24")).json();
+      const t = data.totals || {};
+      $("kpis").innerHTML = `
+        <div class="card"><div class="label"><span class="pill c">Cost</span> Spend</div><div class="value">${money(t.cost_usd)}</div></div>
+        <div class="card"><div class="label"><span class="pill o">Obs</span> Calls</div><div class="value">${t.calls || 0}</div></div>
+        <div class="card"><div class="label"><span class="pill o">Obs</span> Avg ms</div><div class="value">${Math.round(t.avg_latency_ms || 0)}</div></div>
+        <div class="card"><div class="label"><span class="pill s">Sec</span> Flagged</div><div class="value">${t.flagged || 0} / ${t.blocked || 0}</div></div>`;
+      table($("by-model"), ["Model","Calls","Cost"], (data.by_model || []).map((r) => [esc(r.model), r.calls, money(r.cost_usd)]));
+      table($("by-feature"), ["Feature","Calls","Cost"], (data.by_feature || []).map((r) => [esc(r.feature), r.calls, money(r.cost_usd)]));
+      table($("sec-table"), ["Scanner","Severity","Count"], (data.findings || []).map((r) => [esc(r.kind), esc(r.severity), r.n]));
+    }
+
+    async function loadTraces() {
+      const data = await (await fetch("/api/traces")).json();
+      table($("trace-table"), ["When","Feature","Model","Provider","Status","Cost","Security","Preview"],
+        (data.traces || []).map((r) => [
+          esc((r.ts || "").replace("T", " ").slice(0, 19)),
+          esc(r.feature), esc(r.model), esc(r.provider),
+          `<span class="pill ${String(r.status).startsWith("blocked") ? "bad" : "ok"}">${esc(r.status)}</span>`,
+          money(r.cost_usd), esc(r.security_verdict), esc(r.request_preview)
+        ]));
+    }
+
+    async function loadProviders() {
+      const data = await (await fetch("/api/providers")).json();
+      const list = data.providers || [];
+      const sel = $("pg-provider");
+      const current = sel.value;
+      sel.innerHTML = list.map((p) => `<option value="${esc(p.name)}">${esc(p.name)} — ${esc(p.base_url)}</option>`).join("");
+      if (current) sel.value = current;
+      const first = list.find((p) => p.name === sel.value) || list[0];
+      if (first && !$("pg-model").value) $("pg-model").value = first.model_hint || "";
+      table($("prov-table"), ["Name","Base URL","Key env","Model hint","Kind"],
+        list.map((p) => [esc(p.name), esc(p.base_url), esc(p.api_key_env), esc(p.model_hint), esc(p.kind)]));
+    }
+
+    async function loadPricing() {
+      const data = await (await fetch("/api/pricing")).json();
+      const models = data.models || {};
+      table($("price-table"), ["Model","Input / 1M","Output / 1M"],
+        Object.entries(models).map(([name, rate]) => [esc(name), money(rate.input), money(rate.output)]));
+    }
+
+    $("pg-provider").addEventListener("change", async () => {
+      const data = await (await fetch("/api/providers")).json();
+      const p = (data.providers || []).find((x) => x.name === $("pg-provider").value);
+      if (p && p.model_hint) $("pg-model").value = p.model_hint;
+    });
+
+    $("pg-send").addEventListener("click", async () => {
+      $("pg-out").textContent = "Calling Cosen gateway…";
+      const res = await fetch("/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-COS-Feature": $("pg-feature").value || "playground",
+          "X-COS-Project": $("pg-project").value || "local",
+          "X-COS-Provider": $("pg-provider").value
+        },
+        body: JSON.stringify({
+          model: $("pg-model").value || "cos-mock",
+          provider: $("pg-provider").value,
+          messages: [{ role: "user", content: $("pg-prompt").value }]
+        })
+      });
+      const payload = await res.json();
+      if (!res.ok) {
+        $("pg-out").textContent = JSON.stringify(payload, null, 2);
+        loadSummary(); loadTraces();
+        return;
+      }
+      const text = payload?.choices?.[0]?.message?.content || JSON.stringify(payload, null, 2);
+      const meta = payload.cos ? `\n\n— cost ${money(payload.cos.cost_usd)} · ${payload.cos.latency_ms} ms · security ${payload.cos.security}` : "";
+      $("pg-out").textContent = text + meta;
+      loadSummary(); loadTraces();
+    });
+
+    $("pg-scan").addEventListener("click", async () => {
+      const payload = await (await fetch("/api/scan", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: $("pg-prompt").value, side: "input" })
+      })).json();
+      $("pg-out").textContent = (payload.findings || []).length
+        ? JSON.stringify(payload.findings, null, 2)
+        : "clean";
+    });
+
+    $("sec-run").addEventListener("click", async () => {
+      const payload = await (await fetch("/api/scan", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: $("sec-text").value, side: $("sec-side").value })
+      })).json();
+      const findings = payload.findings || [];
+      $("sec-result").innerHTML = findings.length
+        ? findings.map((f) => `<div><span class="pill bad">${esc(f.severity)}</span> ${esc(f.scanner)} — ${esc(f.message)}</div>`).join("")
+        : "<span class='pill ok'>clean</span>";
+    });
+
+    $("p-save").addEventListener("click", async () => {
+      const res = await fetch("/api/providers", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: $("p-name").value,
+          base_url: $("p-url").value,
+          api_key_env: $("p-env").value,
+          model_hint: $("p-model").value
+        })
+      });
+      const payload = await res.json();
+      if (!res.ok) { alert(payload.error || "save failed"); return; }
+      $("p-name").value = $("p-url").value = $("p-env").value = $("p-model").value = "";
+      loadProviders();
+    });
+
+    loadSummary(); loadTraces(); loadProviders(); loadPricing();
+  </script>
+</body>
+</html>

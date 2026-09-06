@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cosen"
+version = "0.2.1"
+description = "Cosen — locally hosted, LLM-agnostic cost, observability, and security suite."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Cosen Labs" }]
+keywords = ["llm", "observability", "cost", "security", "gateway", "ai-ops"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Security",
+  "Topic :: System :: Monitoring",
+]
+dependencies = [
+  "httpx>=0.27",
+  "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+cos = "cosen.cli:main"
+cosen = "cosen.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/cosen-ai/cosen"
+Issues = "https://github.com/cosen-ai/cosen/issues"
+
+[tool.setuptools.packages.find]
+include = ["cosen*"]
+
+[tool.setuptools.package-data]
+cosen = ["data/*.yaml", "policies/*.yaml", "web/*"]

@@ -1,0 +1,46 @@
+# Default Cosen policy. Copy to ./cosen.yaml and edit.
+# Security rules are deterministic — no extra LLM judge required.
+
+project: default
+
+upstream:
+  # Any OpenAI-compatible endpoint: OpenAI, Azure, Groq, Together,
+  # Ollama, vLLM, LiteLLM, OpenRouter, Fireworks, etc.
+  base_url: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+  api_key_env: OPENAI_API_KEY
+
+server:
+  host: 127.0.0.1
+  port: 8080
+
+security:
+  enabled: true
+  # block | redact | observe
+  on_input_match: block
+  on_output_match: redact
+  block_severities: [critical, high]
+  scanners:
+    prompt_injection: true
+    jailbreak: true
+    secrets: true
+    pii: true
+    system_leak: true
+
+cost:
+  enabled: true
+  currency: USD
+  enforce_budgets: true
+  budgets:
+    - scope: project
+      name: default
+      daily_usd: 50.00
+    # Example feature cap:
+    # - scope: feature
+    #   name: checkout-bot
+    #   daily_usd: 10.00
+
+observe:
+  store_prompts: true
+  store_responses: true
+  redact_stored_secrets: true
+  retention_days: 30

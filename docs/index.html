@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="Cosen — local-first, LLM-agnostic cost, observability, and security for AI products."/>
+  <title>Cosen — Cost, Observability, and Security for any model</title>
+  <style>
+    :root {
+      --bg: #090d18;
+      --panel: #12182b;
+      --panel2: #171e34;
+      --ink: #e9eef8;
+      --mute: #8b95b3;
+      --line: #26304a;
+      --cost: #7dd3a0;
+      --obs: #7db3ff;
+      --sec: #f0b07a;
+      --accent: #2a66d8;
+      --accent-hover: #3b7af0;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.6; }
+    a { color: var(--obs); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    header { border-bottom: 1px solid var(--line); background: #0c1222; position: sticky; top: 0; z-index: 10; }
+    .nav { max-width: 1100px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { font-weight: 700; letter-spacing: .14em; font-size: 14px; }
+    .brand span { color: var(--mute); font-weight: 500; letter-spacing: 0; margin-left: 10px; }
+    .nav-links a { margin-left: 22px; font-size: 14px; color: var(--ink); }
+    .hero { text-align: center; padding: 80px 24px 60px; background: radial-gradient(1200px 600px at 50% -10%, #1a2450 0%, var(--bg) 55%); }
+    .hero h1 { font-size: 44px; margin: 0 0 14px; line-height: 1.15; }
+    .hero p { color: var(--mute); font-size: 18px; max-width: 640px; margin: 0 auto 30px; }
+    .cta { display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .btn { display: inline-block; padding: 12px 22px; border-radius: 10px; font-weight: 600; font-size: 15px; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: var(--accent-hover); text-decoration: none; }
+    .btn-secondary { background: var(--panel2); color: var(--ink); border: 1px solid var(--line); }
+    .btn-secondary:hover { background: var(--panel); text-decoration: none; }
+    .section { max-width: 1100px; margin: 0 auto; padding: 60px 24px; }
+    .section h2 { font-size: 28px; margin: 0 0 14px; }
+    .section .lead { color: var(--mute); font-size: 16px; max-width: 700px; margin-bottom: 34px; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+    .card h3 { margin: 0 0 10px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+    .pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+    .c { background: #163226; color: var(--cost); }
+    .o { background: #16243f; color: var(--obs); }
+    .s { background: #3a2a18; color: var(--sec); }
+    .card p { color: var(--mute); margin: 0; font-size: 14px; }
+    .codeblock { background: #0d1324; border: 1px solid var(--line); border-radius: 12px; padding: 18px 22px; overflow-x: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; color: #c9d4f0; }
+    .codeblock .comment { color: #6b7b9c; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+    .feature-list { list-style: none; padding: 0; margin: 0; }
+    .feature-list li { padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--mute); display: flex; align-items: center; gap: 10px; }
+    .feature-list li strong { color: var(--ink); }
+    footer { border-top: 1px solid var(--line); background: #0c1222; padding: 34px 24px; text-align: center; color: var(--mute); font-size: 13px; }
+    @media (max-width: 800px) {
+      .cards { grid-template-columns: 1fr; }
+      .grid2 { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 32px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="brand">COSEN <span>Cost · Observability · Security</span></div>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#start">Start</a>
+        <a href="#why">Why</a>
+        <a href="#cursor">Cursor</a>
+        <a href="https://github.com/cosen-ai/cosen">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>Cost, observability, and security<br/>for any model.</h1>
+    <p>Cosen is a local-first, LLM-agnostic gateway. Host it on your laptop or a private VM. Point any OpenAI-compatible or Anthropic model at it. Every call is priced, traced, and scanned.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="#start">Get started in 5 minutes</a>
+      <a class="btn btn-secondary" href="https://github.com/cosen-ai/cosen">View on GitHub</a>
+    </div>
+  </section>
+
+  <section id="features" class="section">
+    <h2>One suite, three jobs</h2>
+    <p class="lead">Most teams run three disconnected tools. Cosen runs them on the same request path so your data model stays consistent.</p>
+    <div class="cards">
+      <div class="card">
+        <h3><span class="pill c">Cost</span> Feature-level spend</h3>
+        <p>Token usage × model price, tagged by <code>feature</code>, <code>project</code>, and <code>user</code>. Set daily kill-switches before a runaway agent burns the budget.</p>
+      </div>
+      <div class="card">
+        <h3><span class="pill o">Observability</span> Traces & latency</h3>
+        <p>SQLite-backed trace store, local web dashboard, and CLI reports. See model mix, latency, and spend by feature without a SaaS account.</p>
+      </div>
+      <div class="card">
+        <h3><span class="pill s">Security</span> On-path scanners</h3>
+        <p>Deterministic detection for secrets, PII, injection phrasing, jailbreak phrasing, and system-prompt leaks. No extra judge model required.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="start" class="section">
+    <h2>Five-minute start</h2>
+    <p class="lead">Install locally, run the mock model, and open the web app. No API key required.</p>
+    <div class="codeblock">
+      <span class="comment"># Clone the repo</span><br/>
+      git clone https://github.com/cosen-ai/cosen.git<br/>
+      cd cosen<br/><br/>
+      <span class="comment"># Install and run</span><br/>
+      python -m pip install -e .<br/>
+      cosen init<br/>
+      cosen demo<br/>
+      cosen serve --mock &nbsp;<span class="comment"># http://127.0.0.1:8080/</span>
+    </div>
+  </section>
+
+  <section id="why" class="section">
+    <div class="grid2">
+      <div>
+        <h2>Why Cosen</h2>
+        <p class="lead">Built for teams that ship AI products, not another agent framework.</p>
+        <ul class="feature-list">
+          <li><strong>Model-agnostic</strong> — OpenAI-compatible + Anthropic adapters, no vendor SDK lock-in.</li>
+          <li><strong>Local-first</strong> — SQLite on disk, no ClickHouse, no cloud account.</li>
+          <li><strong>Deterministic security</strong> — block or redact on the request path.</li>
+          <li><strong>Product attribution</strong> — tag every call with project, feature, user, session.</li>
+          <li><strong>Open source</strong> — Apache-2.0, self-hostable, with optional Cloud/EE later.</li>
+        </ul>
+      </div>
+      <div class="codeblock">
+        <span class="comment"># Point your OpenAI SDK at Cosen</span><br/>
+        from openai import OpenAI<br/><br/>
+        client = OpenAI(<br/>
+        &nbsp;&nbsp;base_url="http://127.0.0.1:8080/v1",<br/>
+        &nbsp;&nbsp;api_key="not-needed-in-mock"<br/>
+        )<br/><br/>
+        client.chat.completions.create(<br/>
+        &nbsp;&nbsp;model="gpt-4o-mini",<br/>
+        &nbsp;&nbsp;messages=[{"role": "user", "content": "hello"}],<br/>
+        &nbsp;&nbsp;extra_headers={<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"X-COS-Feature": "support-bot",<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"X-COS-Project": "acme"<br/>
+        &nbsp;&nbsp;}<br/>
+        )
+      </div>
+    </div>
+  </section>
+
+  <section id="cursor" class="section">
+    <div class="grid2">
+      <div class="codeblock">
+        <span class="comment">// Add to Cursor MCP settings</span><br/>
+        {<br/>
+        &nbsp;&nbsp;"mcpServers": {<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"cosen": {<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"command": "cosen",<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"args": ["mcp"]<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+        &nbsp;&nbsp;}<br/>
+        }
+      </div>
+      <div>
+        <h2>Works inside Cursor</h2>
+        <p class="lead">Add Cosen as an MCP server and let Cursor scan prompts, estimate costs, read local reports, and route chat calls through the gateway.</p>
+        <ul class="feature-list">
+          <li><strong>Security scan</strong> — check prompts and outputs for secrets or injection.</li>
+          <li><strong>Cost estimate</strong> — model + tokens = USD before you run.</li>
+          <li><strong>Local report</strong> — ask Cursor to summarize spend and findings.</li>
+          <li><strong>Gateway chat</strong> — talk to any connected provider through Cosen.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="text-align:center">
+    <h2>Ready to self-host?</h2>
+    <p class="lead" style="margin:0 auto 24px">Get the code, run the mock server, and start tracing your first AI calls in minutes.</p>
+    <a class="btn btn-primary" href="https://github.com/cosen-ai/cosen">Go to GitHub</a>
+  </section>
+
+  <footer>
+    <p>Cosen is an open-source project by Cosen Labs. Licensed under Apache-2.0.</p>
+    <p>
+      <a href="https://github.com/cosen-ai/cosen">GitHub</a> ·
+      <a href="https://github.com/cosen-ai/cosen/blob/main/CLA.md">CLA</a> ·
+      <a href="https://github.com/cosen-ai/cosen/blob/main/CONTRIBUTING.md">Contributing</a>
+    </p>
+  </footer>
+</body>
+</html>

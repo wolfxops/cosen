@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "cosen": {
+      "command": "cosen",
+      "args": ["mcp"]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+.cosen/
+.cosai/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+cosen.yaml
+cosai.yaml
+cos.yaml
+.DS_Store
