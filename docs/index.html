@@ -72,6 +72,7 @@
         <a href="#start">Start</a>
         <a href="#why">Why</a>
         <a href="#cursor">Cursor</a>
+        <a href="cli-integrations.html">CLI agents</a>
         <a href="https://github.com/cosen-ai/cosen">GitHub</a>
       </nav>
     </div>
@@ -176,6 +177,24 @@
         </ul>
       </div>
     </div>
+  </section>
+
+  <section id="cli" class="section">
+    <h2>Works with LLM CLI agents</h2>
+    <p class="lead">Codex, Claude CLI, aider, and the <code>llm</code> CLI can all route through Cosen.</p>
+    <div class="grid2">
+      <div class="codeblock">
+        <span class="comment"># Codex</span><br/>
+        export OPENAI_BASE_URL=http://127.0.0.1:8080/v1<br/>
+        codex "refactor this function"
+      </div>
+      <div class="codeblock">
+        <span class="comment"># Claude CLI</span><br/>
+        export ANTHROPIC_BASE_URL=http://127.0.0.1:8080/v1<br/>
+        claude "explain this code"
+      </div>
+    </div>
+    <p style="margin-top:18px"><a href="cli-integrations.html">See all CLI agent integrations →</a></p>
   </section>
 
   <section class="section" style="text-align:center">

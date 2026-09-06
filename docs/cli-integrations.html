@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="Use Cosen with Codex, Claude CLI, llm, aider, and other LLM CLI agents."/>
+  <title>Cosen CLI agent integrations</title>
+  <style>
+    :root {
+      --bg: #090d18;
+      --panel: #12182b;
+      --panel2: #171e34;
+      --ink: #e9eef8;
+      --mute: #8b95b3;
+      --line: #26304a;
+      --obs: #7db3ff;
+      --accent: #2a66d8;
+      --accent-hover: #3b7af0;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: ui-sans-serif, system-ui, sans-serif; line-height: 1.6; }
+    a { color: var(--obs); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    header { border-bottom: 1px solid var(--line); background: #0c1222; padding: 16px 24px; }
+    .brand { font-weight: 700; letter-spacing: .14em; font-size: 14px; }
+    .brand span { color: var(--mute); font-weight: 500; letter-spacing: 0; margin-left: 10px; }
+    .back { font-size: 14px; }
+    main { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+    h1 { font-size: 32px; margin: 0 0 10px; }
+    .lead { color: var(--mute); font-size: 17px; margin-bottom: 34px; }
+    h2 { font-size: 22px; margin-top: 38px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+    p { color: var(--mute); }
+    .codeblock { background: #0d1324; border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; overflow-x: auto; font-family: ui-monospace, monospace; font-size: 13px; color: #c9d4f0; margin: 14px 0; }
+    .codeblock .comment { color: #6b7b9c; }
+    ul { color: var(--mute); padding-left: 20px; }
+    li { margin: 8px 0; }
+    footer { border-top: 1px solid var(--line); background: #0c1222; padding: 30px 24px; text-align: center; color: var(--mute); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">COSEN <span>Cost · Observability · Security</span> <a class="back" href="index.html">← back</a></div>
+  </header>
+
+  <main>
+    <h1>CLI agent integrations</h1>
+    <p class="lead">Point any LLM CLI agent at Cosen so every command is priced, traced, and scanned.</p>
+
+    <h2>How it works</h2>
+    <p>Cosen exposes both the OpenAI-compatible <code>/v1/chat/completions</code> and the Anthropic <code>/v1/messages</code> endpoints. CLI agents that talk to either of those formats can use Cosen as a local gateway.</p>
+
+    <h2>OpenAI Codex CLI</h2>
+    <div class="codeblock">
+<span class="comment"># Start Cosen first</span><br/>
+cosen serve --mock<br/><br/>
+<span class="comment"># In another terminal</span><br/>
+export OPENAI_BASE_URL=http://127.0.0.1:8080/v1<br/>
+codex "refactor this function"
+    </div>
+
+    <h2>Anthropic Claude CLI</h2>
+    <div class="codeblock">
+<span class="comment"># Start Cosen first</span><br/>
+cosen serve --mock<br/><br/>
+<span class="comment"># In another terminal</span><br/>
+export ANTHROPIC_BASE_URL=http://127.0.0.1:8080/v1<br/>
+claude "explain this code"
+    </div>
+    <p>Claude CLI sends Anthropic Messages API requests. Cosen translates them internally, runs security scanners, checks budgets, and converts the response back.</p>
+
+    <h2>Simon Willison's <code>llm</code></h2>
+    <div class="codeblock">
+<span class="comment"># Register Cosen as an OpenAI-compatible endpoint</span><br/>
+llm -o base_url http://127.0.0.1:8080/v1 -m gpt-4o-mini "what is the refund window?"
+    </div>
+    <p>Use <code>llm</code> templates or aliases to make Cosen the default for daily use.</p>
+
+    <h2>aider</h2>
+    <div class="codeblock">
+export OPENAI_API_BASE=http://127.0.0.1:8080/v1<br/>
+aider --model gpt-4o-mini
+    </div>
+
+    <h2>What gets traced</h2>
+    <ul>
+      <li>Input scan for secrets, PII, injection, and jailbreak phrasing.</li>
+      <li>Daily budget check before the upstream call.</li>
+      <li>Output scan for system-prompt leaks and secrets.</li>
+      <li>Cost, latency, and feature tags stored in SQLite.</li>
+    </ul>
+    <p>View traces in the web app at <a href="http://127.0.0.1:8080">http://127.0.0.1:8080</a> or run <code>cosen report</code>.</p>
+
+    <h2>Cursor and other editors</h2>
+    <p>For Cursor, use the <a href="cursor-mcp.json">MCP config</a> to expose Cosen tools directly inside the editor. For other editors that support OpenAI-compatible endpoints, set their base URL to <code>http://127.0.0.1:8080/v1</code>.</p>
+  </main>
+
+  <footer>
+    <p>Cosen is an open-source project by Cosen Labs. Licensed under Apache-2.0.</p>
+    <p><a href="https://github.com/cosen-ai/cosen">GitHub</a></p>
+  </footer>
+</body>
+</html>

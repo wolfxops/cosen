@@ -82,7 +82,7 @@ Apache-2.0 does not stop Amazon from hosting the code. Defense is velocity, EE s
 
 ## 4. Design laws (non-negotiable)
 
-1. The model is a plugin. Wire format is **OpenAI-compatible** `/v1/chat/completions` only. No vendor SDK imports.
+1. The model is a plugin. The primary wire format is **OpenAI-compatible** `/v1/chat/completions`; explicit native inbound adapters (e.g. `/v1/messages` for Anthropic CLI tools) are allowed. No vendor SDK imports.
 2. Security runs **on the request path**, not in a weekly batch. Scanners are deterministic first (no required LLM-as-judge).
 3. Cost is a **feature attribute** (`X-COS-Feature`), not a month-end vendor invoice.
 4. First run works **without any API key** (`--mock` / `cos demo`).
@@ -195,7 +195,8 @@ Health: `GET /health` `GET /api/health` → `{ok, service: "cosen", mock, web}`
 
 Gateway:
 
-- `POST /v1/chat/completions` — main path
+- `POST /v1/chat/completions` — main path (OpenAI-compatible)
+- `POST /v1/messages` — Anthropic Messages API inbound path (translated to the same security/cost path)
 - `GET /v1/models`
 
 App API:
@@ -326,15 +327,17 @@ Do these in order. Do not skip to a rewrite unless asked.
 
 1. ✅ **Rename** package/CLI/docs from COS/cosai → Cosen; keep `X-COS-*` headers; Apache-2.0 + CLA.md
 2. ✅ **Provider expansion** — Anthropic Messages API native adapter; keep OpenAI-compat wire format
-3. **Streaming** — buffer SSE or reject `stream:true` with a clear error
-4. **Provider health check** — `GET {base}/models` from the UI
-5. **Embeddings + other OpenAI routes** if needed (`/v1/embeddings`)
-6. **Auth on the web app** when bound to `0.0.0.0` (token or basic auth)
-7. **OpenTelemetry export** optional sidecar
-8. **GitHub Action** — fail PR if security blocks or budget fixture fails
-9. **Better tokenizers** — optional tiktoken; keep 4-char fallback
-10. **Replace stdlib HTTP server** with FastAPI/uvicorn only if streaming + uploads demand it
-11. EE later: SSO, orgs, multi-tenant cloud
+3. ✅ **Inbound Anthropic endpoint** — `/v1/messages` for Claude CLI and other Anthropic-native tools
+4. ✅ **CLI agent integrations** — Codex, Claude CLI, `llm`, aider, plus Cursor MCP
+5. **Streaming** — buffer SSE or reject `stream:true` with a clear error
+6. **Provider health check** — `GET {base}/models` from the UI
+7. **Embeddings + other OpenAI routes** if needed (`/v1/embeddings`)
+8. **Auth on the web app** when bound to `0.0.0.0` (token or basic auth)
+9. **OpenTelemetry export** optional sidecar
+10. **GitHub Action** — fail PR if security blocks or budget fixture fails
+11. **Better tokenizers** — optional tiktoken; keep 4-char fallback
+12. **Replace stdlib HTTP server** with FastAPI/uvicorn only if streaming + uploads demand it
+13. EE later: SSO, orgs, multi-tenant cloud
 
 Explicit non-goals for v0.x: visual agent builder, prompt CMS, RAG engine, LLM-as-judge eval suite, ClickHouse.
 
@@ -387,5 +390,7 @@ If you change architecture (e.g. FastAPI), keep the same URLs and SQLite schema 
 2. ✅ Rename user-facing strings COS → Cosen
 3. ✅ Add `CLA.md` + CONTRIBUTING
 4. ✅ Add Anthropic native adapter while keeping OpenAI-compatible wire format
-5. Implement `stream:true` handling
-6. Add pytest for gateway block/allow using the mock server
+5. ✅ Add `/v1/messages` inbound endpoint for Claude CLI and Anthropic-native tools
+6. ✅ Add Cursor MCP + CLI agent integration docs (Codex, Claude CLI, llm, aider)
+7. Implement `stream:true` handling
+8. Add pytest for gateway block/allow using the mock server

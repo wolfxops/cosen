@@ -157,6 +157,48 @@ Cursor can then:
 - **Read the local report** for cost, latency, and security findings.
 - **Send chat calls** through the running Cosen gateway.
 
+## CLI agent integrations
+
+Cosen also sits in front of LLM CLI agents. Because it exposes both `/v1/chat/completions` (OpenAI) and `/v1/messages` (Anthropic), you can point most CLI tools at the local gateway.
+
+### OpenAI Codex CLI
+
+```bash
+export OPENAI_BASE_URL=http://127.0.0.1:8080/v1
+codex "summarize the refund policy"
+```
+
+### Anthropic Claude CLI
+
+```bash
+export ANTHROPIC_BASE_URL=http://127.0.0.1:8080/v1
+claude "explain this function"
+```
+
+> Claude CLI sends Anthropic Messages API calls; Cosen translates them internally and runs the same security/cost path.
+
+### Simon Willison's `llm`
+
+Register Cosen as an OpenAI-compatible model:
+
+```bash
+llm models --options
+llm -m cosen "what is the refund window?"
+```
+
+(Use `llm` plugins or templates to set `base_url` to `http://127.0.0.1:8080/v1`.)
+
+### aider
+
+```bash
+export OPENAI_API_BASE=http://127.0.0.1:8080/v1
+aider --model gpt-4o-mini
+```
+
+### What gets traced
+
+Every CLI call goes through the same path: input scan, budget check, model call, output scan, trace, cost. You can see them in the web app or with `cosen report`.
+
 ## Policy
 
 `cosen init` copies a default policy. The important knobs:

@@ -55,6 +55,56 @@ def _attr(headers: dict[str, str], name: str, body: dict[str, Any], fallback: st
     return fallback
 
 
+def _anthropic_messages_to_openai(body: dict[str, Any]) -> dict[str, Any]:
+    """Convert an Anthropic Messages request body into an OpenAI-compatible chat body."""
+    messages: list[dict[str, Any]] = []
+    system = body.get("system")
+    if isinstance(system, str):
+        messages.append({"role": "system", "content": system})
+    elif isinstance(system, list):
+        for part in system:
+            if isinstance(part, dict) and part.get("type") == "text":
+                messages.append({"role": "system", "content": str(part.get("text", ""))})
+    for m in body.get("messages", []):
+        if not isinstance(m, dict):
+            continue
+        content = m.get("content")
+        if isinstance(content, list):
+            content = " ".join(str(p.get("text", "")) for p in content if isinstance(p, dict))
+        messages.append({"role": str(m.get("role", "user")), "content": str(content or "")})
+    result: dict[str, Any] = {"model": body.get("model"), "messages": messages}
+    for key in ("max_tokens", "temperature", "top_p", "top_k", "stop", "stream"):
+        if key in body:
+            result[key] = body[key]
+    return result
+
+
+def _openai_completion_to_anthropic(payload: dict[str, Any], status_code: int) -> dict[str, Any]:
+    """Convert an OpenAI chat completion response into an Anthropic Messages response."""
+    if status_code >= 400:
+        error = payload.get("error", {}) if isinstance(payload, dict) else {}
+        return {"type": "error", "error": error}
+    choices = payload.get("choices") or []
+    content: list[dict[str, Any]] = []
+    if choices:
+        text = choices[0].get("message", {}).get("content")
+        if text:
+            content.append({"type": "text", "text": str(text)})
+    usage = payload.get("usage") or {}
+    return {
+        "id": payload.get("id", "cosen-"),
+        "type": "message",
+        "role": "assistant",
+        "model": payload.get("model", ""),
+        "content": content,
+        "usage": {
+            "input_tokens": usage.get("prompt_tokens", 0),
+            "output_tokens": usage.get("completion_tokens", 0),
+        },
+        "stop_reason": choices[0].get("finish_reason") if choices else "stop",
+    }
+
+
 class CosenHandler(BaseHTTPRequestHandler):
     server_version = "Cosen/0.2"
     policy: dict[str, Any] = {}
@@ -83,7 +133,8 @@ class CosenHandler(BaseHTTPRequestHandler):
             "Access-Control-Allow-Headers",
             "Content-Type, Authorization, "
             "X-COS-Feature, X-COS-Project, X-COS-User, X-COS-Session, X-COS-Provider, "
-            "X-Cosen-Feature, X-Cosen-Project, X-Cosen-User, X-Cosen-Session, X-Cosen-Provider",
+            "X-Cosen-Feature, X-Cosen-Project, X-Cosen-User, X-Cosen-Session, X-Cosen-Provider, "
+            "x-api-key, anthropic-version, anthropic-beta",
         )
         self.end_headers()
 
@@ -179,6 +230,9 @@ class CosenHandler(BaseHTTPRequestHandler):
         if path in ("/v1/chat/completions", "/chat/completions"):
             self._chat()
             return
+        if path in ("/v1/messages", "/messages"):
+            self._messages()
+            return
         if path in ("/cos/scan", "/api/scan"):
             body = self._read_json()
             text = str(body.get("text") or "")
@@ -208,9 +262,25 @@ class CosenHandler(BaseHTTPRequestHandler):
         self._json(404, {"error": {"message": "unknown path", "type": "not_found"}})
 
     def _chat(self) -> None:
-        started = time.perf_counter()
         body = self._read_json()
-        headers = self._headers()
+        payload, status_code, _ = self._process_chat(body)
+        self._json(status_code, payload)
+
+    def _messages(self) -> None:
+        """Anthropic Messages API inbound endpoint for Claude CLI and similar tools."""
+        body = self._read_json()
+        openai_body = _anthropic_messages_to_openai(body)
+        payload, status_code, _ = self._process_chat(openai_body)
+        anthropic_payload = _openai_completion_to_anthropic(payload, status_code)
+        self._json(status_code, anthropic_payload)
+
+    def _process_chat(
+        self,
+        body: dict[str, Any],
+        headers: dict[str, str] | None = None,
+    ) -> tuple[dict[str, Any], int, str | None]:
+        started = time.perf_counter()
+        headers = headers or self._headers()
         policy = self.policy
         project = _attr(headers, "project", body, policy.get("project", "default"))
         feature = _attr(headers, "feature", body)
@@ -244,8 +314,7 @@ class CosenHandler(BaseHTTPRequestHandler):
                     "error": "blocked by Cosen security policy",
                 }
             )
-            self._json(
-                403,
+            return (
                 {
                     "error": {
                         "message": "Cosen blocked this request (security policy).",
@@ -253,8 +322,9 @@ class CosenHandler(BaseHTTPRequestHandler):
                         "findings": security.findings_as_dict(input_findings),
                     }
                 },
+                403,
+                None,
             )
-            return
 
         # Cheap pre-check against daily budget using a token estimate.
         est_in = cost.estimate_tokens(req_text)
@@ -279,8 +349,7 @@ class CosenHandler(BaseHTTPRequestHandler):
                     "error": f"budget exceeded: {hit}",
                 }
             )
-            self._json(
-                429,
+            return (
                 {
                     "error": {
                         "message": "Cosen blocked this request (daily budget).",
@@ -288,8 +357,9 @@ class CosenHandler(BaseHTTPRequestHandler):
                         "budget": hit,
                     }
                 },
+                429,
+                None,
             )
-            return
 
         use_mock = (
             self.mock
@@ -359,8 +429,7 @@ class CosenHandler(BaseHTTPRequestHandler):
                     "error": "blocked output by Cosen security policy",
                 }
             )
-            self._json(
-                403,
+            return (
                 {
                     "error": {
                         "message": "Cosen blocked the model output (security policy).",
@@ -368,8 +437,9 @@ class CosenHandler(BaseHTTPRequestHandler):
                         "findings": security.findings_as_dict(output_findings),
                     }
                 },
+                403,
+                None,
             )
-            return
 
         usage = cost.extract_usage(upstream_payload, req_text, resp_text)
         usd = cost.cost_usd(model, usage["prompt_tokens"], usage["completion_tokens"])
@@ -397,8 +467,8 @@ class CosenHandler(BaseHTTPRequestHandler):
         )
 
         if status_code >= 400:
-            self._json(status_code, upstream_payload or {"error": {"message": err or "upstream error"}})
-            return
+            return upstream_payload or {"error": {"message": err or "upstream error"}}, status_code, err
+
         if isinstance(upstream_payload, dict):
             upstream_payload.setdefault("cos", {})
             if isinstance(upstream_payload["cos"], dict):
@@ -410,7 +480,7 @@ class CosenHandler(BaseHTTPRequestHandler):
                         "feature": feature,
                     }
                 )
-        self._json(200, upstream_payload)
+        return upstream_payload, 200, None
 
     def _forward(
         self,
