@@ -4,199 +4,375 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Cosen — Cost · Observability · Security</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg: #090d18;
-      --panel: #12182b;
-      --panel2: #171e34;
-      --ink: #e9eef8;
-      --mute: #8b95b3;
-      --line: #26304a;
-      --cost: #7dd3a0;
-      --obs: #7db3ff;
-      --sec: #f0b07a;
-      --bad: #f07178;
-      --ok: #7dd3a0;
+      --bg: #000;
+      --panel: #0a0a0a;
+      --panel2: #111;
+      --ink: #ededed;
+      --mute: #a1a1aa;
+      --line: rgba(255,255,255,0.1);
+      --line-hover: rgba(255,255,255,0.2);
+      --cost: #34d399;
+      --obs: #60a5fa;
+      --sec: #fb7185;
+      --warn: #fbbf24;
+      --ok: #34d399;
+      --bad: #fb7185;
     }
     * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
-      font-family: ui-sans-serif, system-ui, sans-serif; }
-    .shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100%; }
-    nav { border-right: 1px solid var(--line); padding: 22px 16px; background: #0c1222; }
-    .brand { letter-spacing: .14em; font-weight: 700; font-size: 13px; }
-    .brand span { display: block; color: var(--mute); letter-spacing: 0; font-weight: 500; font-size: 11px; margin-top: 6px; }
-    nav a { display: block; color: var(--ink); text-decoration: none; padding: 10px 12px; border-radius: 10px; margin-top: 6px; font-size: 14px; }
-    nav a:hover, nav a.active { background: var(--panel2); }
-    main { padding: 24px 28px 48px; }
-    h1 { font-size: 22px; margin: 0 0 6px; }
-    .sub { color: var(--mute); font-size: 13px; margin-bottom: 18px; }
-    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
-    .label { color: var(--mute); font-size: 11px; text-transform: uppercase; letter-spacing: .12em; }
-    .value { font-size: 26px; margin-top: 8px; font-variant-numeric: tabular-nums; }
+    html, body {
+      margin: 0; height: 100%;
+      background: var(--bg); color: var(--ink);
+      font-family: Inter, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-attachment: fixed;
+    }
+    .shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100%; }
+    nav {
+      border-right: 1px solid var(--line);
+      padding: 22px 16px;
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(14px);
+      position: sticky; top: 0; height: 100vh;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; letter-spacing: -0.02em; font-size: 15px; padding: 4px 8px 18px;
+    }
+    .brand svg { width: 22px; height: 22px; }
+    .brand small { display: block; color: var(--mute); font-weight: 500; font-size: 11px; letter-spacing: 0; margin-top: 2px; }
+    nav a {
+      display: flex; align-items: center; gap: 10px;
+      color: var(--mute); text-decoration: none;
+      padding: 10px 12px; border-radius: 10px; margin-top: 4px; font-size: 14px; font-weight: 500;
+    }
+    nav a svg { width: 16px; height: 16px; opacity: 0.75; }
+    nav a:hover { background: var(--panel2); color: var(--ink); }
+    nav a.active { background: rgba(255,255,255,0.06); color: var(--ink); border: 1px solid var(--line); }
+    .nav-foot { margin-top: 28px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; font-size: 12px; color: var(--mute); }
+    .nav-foot strong { display: block; color: var(--ink); font-size: 12px; margin-bottom: 4px; }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); margin-right: 6px; box-shadow: 0 0 8px var(--ok); }
+    main { padding: 28px 32px 64px; max-width: 1180px; }
+    .page-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 22px; }
+    h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.03em; font-weight: 750; }
+    .sub { color: var(--mute); font-size: 14px; margin: 0; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .card {
+      background: rgba(10,10,10,0.86);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: ""; position: absolute; inset: 0;
+      background: radial-gradient(420px circle at var(--mx, 0) var(--my, 0), rgba(255,255,255,0.05), transparent 40%);
+      pointer-events: none;
+    }
+    .label { color: var(--mute); font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 600; }
+    .value { font-size: 28px; margin-top: 10px; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; font-weight: 650; }
+    .hint { color: var(--mute); font-size: 12px; margin-top: 6px; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
-    th { color: var(--mute); font-weight: 600; }
-    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--mute); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+    td { color: var(--ink); }
+    .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    label { display: block; color: var(--mute); font-size: 12px; font-weight: 600; }
     input, select, textarea {
-      width: 100%; background: #0d1324; color: var(--ink); border: 1px solid var(--line);
-      border-radius: 10px; padding: 10px 12px; font: inherit;
+      width: 100%; background: #050505; color: var(--ink); border: 1px solid var(--line);
+      border-radius: 10px; padding: 11px 12px; font: inherit; margin-top: 6px;
     }
-    textarea { min-height: 120px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: rgba(96,165,250,0.55); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+    textarea { min-height: 140px; resize: vertical; font-family: Inter, sans-serif; }
     button {
-      background: #2a66d8; color: white; border: 0; border-radius: 10px;
-      padding: 10px 14px; font: inherit; cursor: pointer;
+      background: #fff; color: #000; border: 0; border-radius: 10px;
+      padding: 10px 16px; font: inherit; font-weight: 600; cursor: pointer;
     }
-    button.ghost { background: #1a2340; color: var(--ink); }
-    button.danger { background: #6b2a32; }
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; }
-    .c { background: #163226; color: var(--cost); }
-    .o { background: #16243f; color: var(--obs); }
-    .s { background: #3a2a18; color: var(--sec); }
-    .bad { background: #3a1820; color: var(--bad); }
-    .ok { background: #163226; color: var(--ok); }
-    .page { display: none; }
+    button:hover { transform: translateY(-1px); }
+    button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+    button.danger { background: #3f1218; color: #fecdd3; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; border: 1px solid transparent; }
+    .c { background: rgba(16,185,129,0.12); color: var(--cost); border-color: rgba(16,185,129,0.25); }
+    .o { background: rgba(59,130,246,0.12); color: var(--obs); border-color: rgba(59,130,246,0.25); }
+    .s { background: rgba(244,63,94,0.12); color: var(--sec); border-color: rgba(244,63,94,0.25); }
+    .bad { background: rgba(244,63,94,0.12); color: var(--bad); border-color: rgba(244,63,94,0.25); }
+    .ok { background: rgba(16,185,129,0.12); color: var(--ok); border-color: rgba(16,185,129,0.25); }
+    .warn { background: rgba(251,191,36,0.12); color: var(--warn); border-color: rgba(251,191,36,0.25); }
+    .page { display: none; animation: fade .28s ease; }
     .page.on { display: block; }
-    .chat { background: #0d1324; border: 1px solid var(--line); border-radius: 12px; min-height: 280px; padding: 14px; white-space: pre-wrap; }
+    @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .chat {
+      background: #050505; border: 1px solid var(--line); border-radius: 12px;
+      min-height: 240px; padding: 16px; white-space: pre-wrap;
+      font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 13px; line-height: 1.6;
+    }
     .muted { color: var(--mute); }
-    .formgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    @media (max-width: 900px) {
+    .formgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .bar { height: 6px; background: #171717; border-radius: 99px; overflow: hidden; margin-top: 10px; }
+    .bar > span { display: block; height: 100%; border-radius: 99px; }
+    .empty { text-align: center; color: var(--mute); padding: 28px 12px; }
+    .table-wrap { overflow-x: auto; }
+    .meta { display: flex; gap: 16px; flex-wrap: wrap; color: var(--mute); font-size: 12px; margin-top: 10px; }
+    @media (max-width: 960px) {
       .shell { grid-template-columns: 1fr; }
-      nav { border-right: 0; border-bottom: 1px solid var(--line); }
+      nav { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
       .grid, .row2, .formgrid { grid-template-columns: 1fr; }
+      main { padding: 20px 16px 48px; }
     }
   </style>
 </head>
 <body>
   <div class="shell">
     <nav>
-      <div class="brand">Cosen<span>LLM-agnostic · local web app</span></div>
-      <a href="#overview" data-page="overview" class="active">Overview</a>
-      <a href="#playground" data-page="playground">Playground</a>
-      <a href="#traces" data-page="traces">Traces</a>
-      <a href="#security" data-page="security">Security</a>
-      <a href="#providers" data-page="providers">Providers</a>
-      <a href="#pricing" data-page="pricing">Pricing</a>
+      <div class="brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        <div>Cosen<small>Local gateway</small></div>
+      </div>
+      <a href="#overview" data-page="overview" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </a>
+      <a href="#playground" data-page="playground">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Playground
+      </a>
+      <a href="#traces" data-page="traces">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        Traces
+      </a>
+      <a href="#security" data-page="security">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Security
+      </a>
+      <a href="#providers" data-page="providers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Providers
+      </a>
+      <a href="#pricing" data-page="pricing">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Pricing
+      </a>
+      <div class="nav-foot">
+        <strong><span class="dot" id="health-dot"></span><span id="health-label">Checking...</span></strong>
+        Local SQLite · last 24h
+      </div>
     </nav>
     <main>
       <section id="overview" class="page on">
-        <h1>Overview</h1>
-        <div class="sub">Last 24 hours on this machine. Host Cosen locally; point any OpenAI-compatible or Anthropic model at it.</div>
+        <div class="page-head">
+          <div>
+            <h1>Overview</h1>
+            <p class="sub">Last 24 hours on this machine. Every call is priced, traced, and scanned.</p>
+          </div>
+          <button class="ghost" id="refresh">Refresh</button>
+        </div>
         <div class="grid" id="kpis"></div>
         <div class="row2">
-          <div class="card"><div class="label">Spend by model</div><table id="by-model"></table></div>
-          <div class="card"><div class="label">Spend by feature</div><table id="by-feature"></table></div>
+          <div class="card">
+            <div class="label">Spend by model</div>
+            <div class="table-wrap"><table id="by-model"></table></div>
+          </div>
+          <div class="card">
+            <div class="label">Spend by feature</div>
+            <div class="table-wrap"><table id="by-feature"></table></div>
+          </div>
         </div>
       </section>
 
       <section id="playground" class="page">
-        <h1>Playground</h1>
-        <div class="sub">Talk to any connected provider through Cosen. The same cost, trace, and security path as production.</div>
-        <div class="formgrid">
-          <label>Provider<select id="pg-provider"></select></label>
-          <label>Model<input id="pg-model" placeholder="gpt-4o-mini or claude-sonnet-4"/></label>
-          <label>Feature tag<input id="pg-feature" value="playground"/></label>
-          <label>Project<input id="pg-project" value="local"/></label>
+        <div class="page-head">
+          <div>
+            <h1>Playground</h1>
+            <p class="sub">Same cost, trace, and security path as production traffic.</p>
+          </div>
         </div>
-        <label style="display:block;margin-top:10px">Prompt<textarea id="pg-prompt">Explain how to keep an AI feature model-agnostic in one paragraph.</textarea></label>
-        <div class="actions">
-          <button id="pg-send">Send through Cosen</button>
-          <button class="ghost" id="pg-scan">Scan prompt only</button>
+        <div class="card">
+          <div class="formgrid">
+            <label>Provider<select id="pg-provider"></select></label>
+            <label>Model<input id="pg-model" placeholder="gpt-4o-mini or claude-sonnet-4"/></label>
+            <label>Feature tag<input id="pg-feature" value="playground"/></label>
+            <label>Project<input id="pg-project" value="local"/></label>
+          </div>
+          <label style="margin-top:12px">Prompt<textarea id="pg-prompt">Explain how to keep an AI feature model-agnostic in one paragraph.</textarea></label>
+          <div class="actions">
+            <button id="pg-send">Send through Cosen</button>
+            <button class="ghost" id="pg-scan">Scan prompt only</button>
+          </div>
         </div>
-        <div class="card" style="margin-top:12px"><div class="label">Response</div><div class="chat" id="pg-out" class="muted">No call yet.</div></div>
+        <div class="card" style="margin-top:14px">
+          <div class="label">Response</div>
+          <div class="chat muted" id="pg-out">No call yet.</div>
+          <div class="meta" id="pg-meta"></div>
+        </div>
       </section>
 
       <section id="traces" class="page">
-        <h1>Traces</h1>
-        <div class="sub">Every gateway call lands here — mock, cloud, or local models.</div>
-        <div class="card"><table id="trace-table"></table></div>
+        <div class="page-head">
+          <div>
+            <h1>Traces</h1>
+            <p class="sub">Every gateway call — mock, cloud, or local models.</p>
+          </div>
+        </div>
+        <div class="card table-wrap"><table id="trace-table"></table></div>
       </section>
 
       <section id="security" class="page">
-        <h1>Security</h1>
-        <div class="sub">On-path scanners. No extra judge model required.</div>
+        <div class="page-head">
+          <div>
+            <h1>Security</h1>
+            <p class="sub">On-path scanners. No extra judge model required.</p>
+          </div>
+        </div>
         <div class="row2">
           <div class="card">
             <div class="label">Paste text</div>
             <textarea id="sec-text" placeholder="Prompt or model output"></textarea>
             <div class="actions">
-              <select id="sec-side"><option value="input">input</option><option value="output">output</option></select>
+              <select id="sec-side" style="width:auto;margin:0"><option value="input">input</option><option value="output">output</option></select>
               <button id="sec-run">Scan</button>
             </div>
-            <div id="sec-result" class="muted" style="margin-top:10px"></div>
+            <div id="sec-result" class="muted" style="margin-top:12px"></div>
           </div>
-          <div class="card"><div class="label">Findings (24h)</div><table id="sec-table"></table></div>
+          <div class="card">
+            <div class="label">Findings (24h)</div>
+            <div class="table-wrap"><table id="sec-table"></table></div>
+          </div>
         </div>
       </section>
 
       <section id="providers" class="page">
-        <h1>Providers</h1>
-        <div class="sub">OpenAI-compatible or Anthropic base URLs. Keys stay in environment variables on this host.</div>
-        <div class="card"><table id="prov-table"></table></div>
-        <div class="card" style="margin-top:12px">
+        <div class="page-head">
+          <div>
+            <h1>Providers</h1>
+            <p class="sub">OpenAI-compatible or Anthropic URLs. Keys stay in host environment variables.</p>
+          </div>
+        </div>
+        <div class="card table-wrap"><table id="prov-table"></table></div>
+        <div class="card" style="margin-top:14px">
           <div class="label">Add or update provider</div>
-          <div class="formgrid" style="margin-top:10px">
+          <div class="formgrid" style="margin-top:12px">
             <input id="p-name" placeholder="name (ollama, groq, anthropic)"/>
             <input id="p-url" placeholder="https://host/v1"/>
             <input id="p-env" placeholder="API key env (OPENAI_API_KEY)"/>
             <input id="p-model" placeholder="default model hint"/>
+            <label>Kind
+              <select id="p-kind">
+                <option value="openai_compat">openai_compat</option>
+                <option value="anthropic">anthropic</option>
+                <option value="mock">mock</option>
+              </select>
+            </label>
           </div>
           <div class="actions"><button id="p-save">Save provider</button></div>
         </div>
       </section>
 
       <section id="pricing" class="page">
-        <h1>Pricing table</h1>
-        <div class="sub">Planning rates per 1M tokens. Local / self-hosted models can be $0.</div>
-        <div class="card"><table id="price-table"></table></div>
+        <div class="page-head">
+          <div>
+            <h1>Pricing table</h1>
+            <p class="sub">Planning rates per 1M tokens. Local / self-hosted models can be $0.</p>
+          </div>
+        </div>
+        <div class="card table-wrap"><table id="price-table"></table></div>
       </section>
     </main>
   </div>
   <script>
     const $ = (id) => document.getElementById(id);
     const pages = document.querySelectorAll(".page");
-    const links = document.querySelectorAll("nav a");
+    const links = document.querySelectorAll("nav a[data-page]");
 
     function show(name) {
-      pages.forEach((p) => p.classList.toggle("on", p.id === name));
-      links.forEach((a) => a.classList.toggle("active", a.dataset.page === name));
+      const id = name || "overview";
+      pages.forEach((p) => p.classList.toggle("on", p.id === id));
+      links.forEach((a) => a.classList.toggle("active", a.dataset.page === id));
     }
     window.addEventListener("hashchange", () => show((location.hash || "#overview").slice(1)));
     show((location.hash || "#overview").slice(1));
+
+    document.querySelectorAll(".card").forEach((card) => {
+      card.addEventListener("mousemove", (e) => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+        card.style.setProperty("--my", (e.clientY - r.top) + "px");
+      });
+    });
 
     function money(v) { return "$" + Number(v || 0).toFixed(4); }
     function esc(v) { return String(v ?? "—").replace(/[&<>]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
     function table(el, headers, rows) {
       if (!rows.length) {
-        el.innerHTML = "<tr><td class='muted'>No data yet.</td></tr>";
+        el.innerHTML = "<tr><td class='empty' colspan='" + headers.length + "'>No data yet. Send a call through the gateway.</td></tr>";
         return;
       }
       el.innerHTML = "<thead><tr>" + headers.map((h) => `<th>${h}</th>`).join("") + "</tr></thead><tbody>" +
         rows.map((r) => "<tr>" + r.map((c) => `<td>${c}</td>`).join("") + "</tr>").join("") + "</tbody>";
+    }
+    function bar(share, color) {
+      const pct = Math.max(4, Math.round((share || 0) * 100));
+      return `<div class="bar"><span style="width:${pct}%;background:${color}"></span></div>`;
+    }
+    function statusPill(status) {
+      const blocked = String(status || "").startsWith("blocked");
+      const err = status === "upstream_error";
+      const cls = blocked || err ? "bad" : "ok";
+      return `<span class="pill ${cls}">${esc(status)}</span>`;
+    }
+
+    async function loadHealth() {
+      try {
+        const data = await (await fetch("/api/health")).json();
+        $("health-dot").style.background = data.ok ? "var(--ok)" : "var(--bad)";
+        $("health-label").textContent = data.mock ? "Mock mode" : "Gateway live";
+      } catch {
+        $("health-dot").style.background = "var(--bad)";
+        $("health-label").textContent = "Offline";
+      }
     }
 
     async function loadSummary() {
       const data = await (await fetch("/api/summary?hours=24")).json();
       const t = data.totals || {};
       $("kpis").innerHTML = `
-        <div class="card"><div class="label"><span class="pill c">Cost</span> Spend</div><div class="value">${money(t.cost_usd)}</div></div>
-        <div class="card"><div class="label"><span class="pill o">Obs</span> Calls</div><div class="value">${t.calls || 0}</div></div>
-        <div class="card"><div class="label"><span class="pill o">Obs</span> Avg ms</div><div class="value">${Math.round(t.avg_latency_ms || 0)}</div></div>
-        <div class="card"><div class="label"><span class="pill s">Sec</span> Flagged</div><div class="value">${t.flagged || 0} / ${t.blocked || 0}</div></div>`;
-      table($("by-model"), ["Model","Calls","Cost"], (data.by_model || []).map((r) => [esc(r.model), r.calls, money(r.cost_usd)]));
-      table($("by-feature"), ["Feature","Calls","Cost"], (data.by_feature || []).map((r) => [esc(r.feature), r.calls, money(r.cost_usd)]));
-      table($("sec-table"), ["Scanner","Severity","Count"], (data.findings || []).map((r) => [esc(r.kind), esc(r.severity), r.n]));
+        <div class="card"><div class="label"><span class="pill c">Cost</span></div><div class="value">${money(t.cost_usd)}</div><div class="hint">Spend in the last 24h</div></div>
+        <div class="card"><div class="label"><span class="pill o">Obs</span></div><div class="value">${t.calls || 0}</div><div class="hint">Gateway calls</div></div>
+        <div class="card"><div class="label"><span class="pill o">Latency</span></div><div class="value">${Math.round(t.avg_latency_ms || 0)}<span style="font-size:16px;color:var(--mute)"> ms</span></div><div class="hint">Average round trip</div></div>
+        <div class="card"><div class="label"><span class="pill s">Security</span></div><div class="value">${t.flagged || 0} / ${t.blocked || 0}</div><div class="hint">Flagged / blocked</div></div>`;
+      const modelMax = Math.max(...(data.by_model || []).map((r) => Number(r.cost_usd) || 0), 0.000001);
+      const featMax = Math.max(...(data.by_feature || []).map((r) => Number(r.cost_usd) || 0), 0.000001);
+      table($("by-model"), ["Model","Calls","Cost",""], (data.by_model || []).map((r) => [
+        `<span class="mono">${esc(r.model)}</span>`, r.calls, money(r.cost_usd), bar(Number(r.cost_usd) / modelMax, "var(--obs)")
+      ]));
+      table($("by-feature"), ["Feature","Calls","Cost",""], (data.by_feature || []).map((r) => [
+        esc(r.feature), r.calls, money(r.cost_usd), bar(Number(r.cost_usd) / featMax, "var(--cost)")
+      ]));
+      table($("sec-table"), ["Scanner","Severity","Count"], (data.findings || []).map((r) => [
+        esc(r.kind), `<span class="pill ${r.severity === "critical" || r.severity === "high" ? "bad" : "warn"}">${esc(r.severity)}</span>`, r.n
+      ]));
     }
 
     async function loadTraces() {
       const data = await (await fetch("/api/traces")).json();
       table($("trace-table"), ["When","Feature","Model","Provider","Status","Cost","Security","Preview"],
         (data.traces || []).map((r) => [
-          esc((r.ts || "").replace("T", " ").slice(0, 19)),
-          esc(r.feature), esc(r.model), esc(r.provider),
-          `<span class="pill ${String(r.status).startsWith("blocked") ? "bad" : "ok"}">${esc(r.status)}</span>`,
-          money(r.cost_usd), esc(r.security_verdict), esc(r.request_preview)
+          `<span class="mono muted">${esc((r.ts || "").replace("T", " ").slice(0, 19))}</span>`,
+          esc(r.feature), `<span class="mono">${esc(r.model)}</span>`, esc(r.provider),
+          statusPill(r.status), money(r.cost_usd), esc(r.security_verdict),
+          `<span class="muted">${esc(r.request_preview)}</span>`
         ]));
     }
 
@@ -210,16 +386,29 @@
       const first = list.find((p) => p.name === sel.value) || list[0];
       if (first && !$("pg-model").value) $("pg-model").value = first.model_hint || "";
       table($("prov-table"), ["Name","Base URL","Key env","Model hint","Kind"],
-        list.map((p) => [esc(p.name), esc(p.base_url), esc(p.api_key_env), esc(p.model_hint), esc(p.kind)]));
+        list.map((p) => [
+          esc(p.name),
+          `<span class="mono muted">${esc(p.base_url)}</span>`,
+          esc(p.api_key_env),
+          `<span class="mono">${esc(p.model_hint)}</span>`,
+          `<span class="pill o">${esc(p.kind)}</span>`
+        ]));
     }
 
     async function loadPricing() {
       const data = await (await fetch("/api/pricing")).json();
       const models = data.models || {};
       table($("price-table"), ["Model","Input / 1M","Output / 1M"],
-        Object.entries(models).map(([name, rate]) => [esc(name), money(rate.input), money(rate.output)]));
+        Object.entries(models).map(([name, rate]) => [
+          `<span class="mono">${esc(name)}</span>`, money(rate.input), money(rate.output)
+        ]));
     }
 
+    async function reload() {
+      await Promise.all([loadHealth(), loadSummary(), loadTraces(), loadProviders(), loadPricing()]);
+    }
+
+    $("refresh").addEventListener("click", reload);
     $("pg-provider").addEventListener("change", async () => {
       const data = await (await fetch("/api/providers")).json();
       const p = (data.providers || []).find((x) => x.name === $("pg-provider").value);
@@ -227,7 +416,9 @@
     });
 
     $("pg-send").addEventListener("click", async () => {
+      $("pg-out").classList.remove("muted");
       $("pg-out").textContent = "Calling Cosen gateway…";
+      $("pg-meta").innerHTML = "";
       const res = await fetch("/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -245,12 +436,18 @@
       const payload = await res.json();
       if (!res.ok) {
         $("pg-out").textContent = JSON.stringify(payload, null, 2);
+        $("pg-meta").innerHTML = `<span class="pill bad">${res.status}</span>`;
         loadSummary(); loadTraces();
         return;
       }
       const text = payload?.choices?.[0]?.message?.content || JSON.stringify(payload, null, 2);
-      const meta = payload.cos ? `\n\n— cost ${money(payload.cos.cost_usd)} · ${payload.cos.latency_ms} ms · security ${payload.cos.security}` : "";
-      $("pg-out").textContent = text + meta;
+      $("pg-out").textContent = text;
+      if (payload.cos) {
+        $("pg-meta").innerHTML = `
+          <span class="pill c">${money(payload.cos.cost_usd)}</span>
+          <span class="pill o">${payload.cos.latency_ms} ms</span>
+          <span class="pill ${payload.cos.security === "allow" ? "ok" : "warn"}">${esc(payload.cos.security)}</span>`;
+      }
       loadSummary(); loadTraces();
     });
 
@@ -259,9 +456,13 @@
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: $("pg-prompt").value, side: "input" })
       })).json();
+      $("pg-out").classList.remove("muted");
       $("pg-out").textContent = (payload.findings || []).length
         ? JSON.stringify(payload.findings, null, 2)
         : "clean";
+      $("pg-meta").innerHTML = (payload.findings || []).length
+        ? `<span class="pill bad">${payload.findings.length} finding(s)</span>`
+        : `<span class="pill ok">clean</span>`;
     });
 
     $("sec-run").addEventListener("click", async () => {
@@ -271,7 +472,7 @@
       })).json();
       const findings = payload.findings || [];
       $("sec-result").innerHTML = findings.length
-        ? findings.map((f) => `<div><span class="pill bad">${esc(f.severity)}</span> ${esc(f.scanner)} — ${esc(f.message)}</div>`).join("")
+        ? findings.map((f) => `<div style="margin:8px 0"><span class="pill bad">${esc(f.severity)}</span> ${esc(f.scanner)} — ${esc(f.message)}</div>`).join("")
         : "<span class='pill ok'>clean</span>";
     });
 
@@ -282,16 +483,18 @@
           name: $("p-name").value,
           base_url: $("p-url").value,
           api_key_env: $("p-env").value,
-          model_hint: $("p-model").value
+          model_hint: $("p-model").value,
+          kind: $("p-kind").value
         })
       });
       const payload = await res.json();
       if (!res.ok) { alert(payload.error || "save failed"); return; }
       $("p-name").value = $("p-url").value = $("p-env").value = $("p-model").value = "";
+      $("p-kind").value = "openai_compat";
       loadProviders();
     });
 
-    loadSummary(); loadTraces(); loadProviders(); loadPricing();
+    reload();
   </script>
 </body>
 </html>

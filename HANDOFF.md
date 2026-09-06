@@ -42,7 +42,7 @@ Do **not** launch as COS or COSAI:
 |---|---|
 | Product | Cosen |
 | Tagline | Cost, observability, and security for any model |
-| GitHub org / repo (suggested) | `cosen-ai/cosen` or `wolfxops/cosen` |
+| GitHub org / repo | `wolfxops/cosen` |
 | pip (today) | package is `cosen` |
 | CLI today | `cosen` (with `cos` alias for compatibility) |
 | Target CLI | `cosen` |

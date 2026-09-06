@@ -12,7 +12,7 @@ contributions. By submitting a contribution, you agree to these terms.
   or other material submitted to the Project for inclusion in the repository.
 - **"You"** means the individual or legal entity that submits a Contribution.
 - **"Project"** means the Cosen open-source project hosted under the
-  `cosen-ai/cosen` repository and related repositories.
+  `wolfxops/cosen` repository and related repositories.
 - **"Maintainer"** means Cosen Labs, the copyright holder of the Project.
 
 ## 2. Grant of Copyright License
