@@ -1,233 +1,249 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="description" content="Cosen — local-first, LLM-agnostic cost, observability, and security for AI products."/>
-  <title>Cosen | Enterprise AI Gateway</title>
+  <title>Cosen | The AI Gateway for Production</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-base: #030712;
-      --bg-surface: #111827;
-      --bg-surface-hover: #1f2937;
-      --border: #374151;
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
-      --accent-blue: #3b82f6;
-      --accent-blue-hover: #2563eb;
-      --accent-teal: #10b981;
-      --accent-purple: #8b5cf6;
-      --accent-rose: #f43f5e;
-      --glow-blue: rgba(59, 130, 246, 0.15);
-      --glow-teal: rgba(16, 185, 129, 0.15);
-      --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      --bg-base: #000000;
+      --bg-card: #0a0a0a;
+      --bg-card-hover: #111111;
+      --border: rgba(255, 255, 255, 0.1);
+      --border-hover: rgba(255, 255, 255, 0.2);
+      --text-main: #ededed;
+      --text-muted: #a1a1aa;
+      --accent: #ffffff;
+      --blue: #3b82f6;
+      --purple: #8b5cf6;
+      --emerald: #10b981;
+      --rose: #f43f5e;
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body { 
-      margin: 0; 
       background-color: var(--bg-base); 
       color: var(--text-main); 
       font-family: var(--font-sans); 
       line-height: 1.6; 
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Grid Background & Glow */
+    .bg-grid {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2;
       background-image: 
-        radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08), transparent 25%),
-        radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
-      background-attachment: fixed;
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse at top, black 0%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at top, black 0%, transparent 70%);
+    }
+    .bg-glow {
+      position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 400px; z-index: -1;
+      background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+      pointer-events: none;
     }
 
-    a { color: var(--accent-blue); text-decoration: none; transition: color 0.2s; }
-    a:hover { color: #60a5fa; }
-
-    /* Header & Navigation */
+    a { color: var(--text-main); text-decoration: none; transition: color 0.2s; }
+    
+    /* Header */
     header { 
-      position: fixed; 
-      top: 0; width: 100%; 
-      z-index: 50; 
-      background: rgba(3, 7, 18, 0.7); 
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .nav-container { 
-      max-width: 1200px; 
-      margin: 0 auto; 
-      padding: 16px 24px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-    }
-    .brand { 
-      font-weight: 700; 
-      font-size: 18px; 
-      letter-spacing: 0.05em; 
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .brand svg { width: 24px; height: 24px; color: var(--accent-blue); }
-    .nav-links { display: flex; gap: 32px; align-items: center; }
-    .nav-links a { color: var(--text-muted); font-size: 14px; font-weight: 500; }
-    .nav-links a:hover { color: var(--text-main); }
-    .nav-links .btn-nav { 
-      background: var(--text-main); 
-      color: var(--bg-base); 
-      padding: 8px 16px; 
-      border-radius: 6px; 
-    }
-    .nav-links .btn-nav:hover { background: #e5e7eb; color: var(--bg-base); }
-
-    /* Typography */
-    h1, h2, h3 { line-height: 1.2; margin: 0; }
-    .text-gradient {
-      background: linear-gradient(to right, #60a5fa, #a78bfa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* Hero Section */
-    .hero { 
-      padding: 160px 24px 80px; 
-      text-align: center; 
-      max-width: 900px; 
-      margin: 0 auto; 
-    }
-    .hero h1 { font-size: clamp(40px, 5vw, 64px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 24px; }
-    .hero p { font-size: 20px; color: var(--text-muted); margin-bottom: 40px; font-weight: 400; }
-    .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    
-    .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 15px;
-      transition: all 0.2s; cursor: pointer; border: 1px solid transparent;
-    }
-    .btn-primary { background: var(--accent-blue); color: white; box-shadow: 0 0 20px var(--glow-blue); }
-    .btn-primary:hover { background: var(--accent-blue-hover); transform: translateY(-1px); }
-    .btn-secondary { background: var(--bg-surface); color: var(--text-main); border-color: var(--border); }
-    .btn-secondary:hover { background: var(--bg-surface-hover); border-color: #4b5563; }
-
-    /* Infographic / Architecture Diagram */
-    .diagram-section { max-width: 1000px; margin: 0 auto 100px; padding: 0 24px; }
-    .diagram-container {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    }
-    .diagram-container::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    }
-    .diag-node {
-      background: var(--bg-base); border: 1px solid var(--border);
-      border-radius: 12px; padding: 20px; text-align: center;
-      width: 220px; position: relative; z-index: 2;
-    }
-    .diag-node.core {
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 30px var(--glow-blue);
-    }
-    .diag-node h4 { font-size: 16px; margin-bottom: 12px; font-weight: 600; }
-    .diag-list { list-style: none; padding: 0; margin: 0; text-align: left; font-size: 13px; color: var(--text-muted); }
-    .diag-list li { margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-    .diag-list li::before { content: '•'; color: var(--accent-blue); }
-    
-    .diag-arrow {
-      flex: 1; height: 2px; background: var(--border); position: relative;
-      margin: 0 15px; display: flex; align-items: center; justify-content: center;
-    }
-    .diag-arrow::after {
-      content: ''; position: absolute; right: -2px; top: -4px;
-      border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 6px solid var(--border);
-    }
-    .diag-label { position: absolute; top: -25px; font-size: 12px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; background: var(--bg-surface); padding: 0 8px; }
-
-    /* Features Grid */
-    .section { max-width: 1200px; margin: 0 auto 120px; padding: 0 24px; }
-    .section-header { text-align: center; margin-bottom: 60px; }
-    .section-header h2 { font-size: 36px; font-weight: 700; margin-bottom: 16px; }
-    .section-header p { font-size: 18px; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
-    
-    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
-    .feature-card {
-      background: rgba(17, 24, 39, 0.5);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 32px;
-      transition: all 0.3s ease;
-    }
-    .feature-card:hover {
-      background: var(--bg-surface);
-      border-color: #4b5563;
-      transform: translateY(-4px);
-    }
-    .feature-icon {
-      width: 48px; height: 48px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center; margin-bottom: 24px;
-    }
-    .icon-cost { background: var(--glow-teal); color: var(--accent-teal); }
-    .icon-obs { background: var(--glow-blue); color: var(--accent-blue); }
-    .icon-sec { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
-    .feature-card h3 { font-size: 20px; margin-bottom: 12px; }
-    .feature-card p { color: var(--text-muted); font-size: 15px; margin: 0; }
-
-    /* Code Windows */
-    .code-showcase { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
-    .mac-window {
-      background: #0d1117; border: 1px solid var(--border); border-radius: 12px;
-      overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    }
-    .mac-header {
-      background: #1f2937; padding: 12px 16px; display: flex; gap: 8px;
+      position: fixed; top: 0; width: 100%; z-index: 50; 
+      background: rgba(0, 0, 0, 0.5); 
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
     }
-    .mac-dot { width: 12px; height: 12px; border-radius: 50%; }
-    .dot-r { background: #ff5f56; }
-    .dot-y { background: #ffbd2e; }
-    .dot-g { background: #27c93f; }
-    .mac-body { padding: 20px; font-family: var(--font-mono); font-size: 14px; overflow-x: auto; color: #e5e7eb; }
-    .token-comment { color: #6b7280; }
-    .token-keyword { color: #c678dd; }
-    .token-string { color: #98c379; }
-    .token-function { color: #61afef; }
+    .nav-container { 
+      max-width: 1200px; margin: 0 auto; padding: 16px 24px; 
+      display: flex; align-items: center; justify-content: space-between; 
+    }
+    .brand { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.02em; }
+    .brand svg { width: 22px; height: 22px; }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a { color: var(--text-muted); font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text-main); }
+    
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 20px; border-radius: 8px; font-weight: 500; font-size: 14px;
+      transition: all 0.2s ease; cursor: pointer; text-decoration: none;
+    }
+    .btn-primary { 
+      background: var(--text-main); color: var(--bg-base); 
+      box-shadow: 0 0 20px rgba(255,255,255,0.1);
+    }
+    .btn-primary:hover { background: #ffffff; transform: translateY(-1px); box-shadow: 0 0 30px rgba(255,255,255,0.2); }
+    .btn-secondary { 
+      background: rgba(255,255,255,0.03); color: var(--text-main); 
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: var(--border-hover); }
 
-    /* Integrations */
-    .integrations { text-align: center; padding: 60px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: rgba(17, 24, 39, 0.3); margin-bottom: 100px; }
-    .integrations p { color: var(--text-muted); font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 32px; font-weight: 600; }
-    .logo-cloud { display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; opacity: 0.7; }
-    .logo-item { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
-    .logo-item svg { width: 28px; height: 28px; }
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-up { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* Hero */
+    .hero { padding: 180px 24px 100px; text-align: center; max-width: 900px; margin: 0 auto; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 500;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      color: var(--text-muted); margin-bottom: 24px; transition: all 0.2s;
+    }
+    .badge:hover { background: rgba(255,255,255,0.1); color: var(--text-main); }
+    .hero h1 { 
+      font-size: clamp(48px, 6vw, 72px); font-weight: 800; letter-spacing: -0.04em; 
+      line-height: 1.1; margin-bottom: 24px;
+      background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p { font-size: 20px; color: var(--text-muted); margin-bottom: 40px; font-weight: 400; max-width: 640px; margin-left: auto; margin-right: auto; line-height: 1.5; }
+    .hero-ctas { display: flex; gap: 16px; justify-content: center; }
+
+    /* Flow Diagram (Animated) */
+    .flow-section { max-width: 1000px; margin: 0 auto 120px; padding: 0 24px; }
+    .flow-container {
+      position: relative; display: flex; align-items: center; justify-content: space-between;
+      padding: 40px; background: rgba(10,10,10,0.6); border: 1px solid var(--border);
+      border-radius: 20px; backdrop-filter: blur(10px);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .flow-node {
+      background: #000; border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px; width: 220px; position: relative; z-index: 2;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .flow-node.core { border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 40px rgba(59, 130, 246, 0.15), inset 0 0 20px rgba(59, 130, 246, 0.05); }
+    .flow-node h4 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--text-main); }
+    .flow-list { list-style: none; font-size: 13px; color: var(--text-muted); }
+    .flow-list li { margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .flow-list li svg { width: 14px; height: 14px; color: var(--text-muted); }
+    .core .flow-list li:nth-child(1) svg { color: var(--rose); }
+    .core .flow-list li:nth-child(2) svg { color: var(--emerald); }
+    .core .flow-list li:nth-child(3) svg { color: var(--blue); }
+
+    .flow-line { flex: 1; height: 1px; background: var(--border); position: relative; margin: 0 20px; }
+    @keyframes particleFlow {
+      0% { left: 0; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { left: 100%; opacity: 0; }
+    }
+    .flow-particle {
+      position: absolute; top: -1px; width: 60px; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--blue));
+      animation: particleFlow 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    .flow-label {
+      position: absolute; top: -24px; left: 50%; transform: translateX(-50%);
+      font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); background: #0a0a0a; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border);
+    }
+
+    /* Bento Grid */
+    .bento-section { max-width: 1200px; margin: 0 auto 120px; padding: 0 24px; }
+    .section-title { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 16px; text-align: center; }
+    .section-sub { font-size: 18px; color: var(--text-muted); text-align: center; margin-bottom: 60px; max-width: 600px; margin-left: auto; margin-right: auto; }
+    
+    .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .bento-card {
+      position: relative; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    .bento-large { grid-column: span 2; }
+    
+    /* Spotlight Effect */
+    .spotlight {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;
+      background: radial-gradient(600px circle at var(--mouse-x, -100%) var(--mouse-y, -100%), rgba(255,255,255,0.06), transparent 40%);
+      z-index: 1; opacity: 0; transition: opacity 0.3s;
+    }
+    .bento-card:hover .spotlight { opacity: 1; }
+    .bento-card:hover { border-color: var(--border-hover); }
+
+    .bento-icon {
+      width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; margin-bottom: 24px;
+      background: rgba(255,255,255,0.03); position: relative; z-index: 2;
+    }
+    .bento-content { position: relative; z-index: 2; }
+    .bento-content h3 { font-size: 20px; font-weight: 600; margin-bottom: 12px; letter-spacing: -0.01em; }
+    .bento-content p { color: var(--text-muted); font-size: 15px; }
+
+    /* Visuals inside Bento */
+    .bento-visual { margin-top: 24px; padding: 16px; background: #000; border: 1px solid var(--border); border-radius: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+    .log-line { display: flex; gap: 12px; margin-bottom: 8px; }
+    .log-time { color: #52525b; }
+    .log-level.crit { color: var(--rose); }
+    .log-level.warn { color: #eab308; }
+    .log-level.info { color: var(--blue); }
+
+    /* Code Terminal */
+    .terminal-section { max-width: 1000px; margin: 0 auto 120px; padding: 0 24px; }
+    .terminal {
+      background: #000; border: 1px solid var(--border); border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .term-header {
+      background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border);
+      padding: 12px 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .term-dot:nth-child(1) { background: #ff5f56; }
+    .term-dot:nth-child(2) { background: #ffbd2e; }
+    .term-dot:nth-child(3) { background: #27c93f; }
+    .term-title { margin: 0 auto; font-size: 12px; color: var(--text-muted); font-family: var(--font-sans); }
+    .term-body { padding: 24px; font-family: var(--font-mono); font-size: 14px; line-height: 1.7; overflow-x: auto; }
+    .token-comment { color: #6b7280; }
+    .token-keyword { color: #ff7b72; }
+    .token-string { color: #a5d6ff; }
+    .token-function { color: #d2a8ff; }
+    .token-class { color: #79c0ff; }
 
     /* Footer */
-    footer { background: var(--bg-surface); padding: 48px 24px; border-top: 1px solid var(--border); }
+    footer { border-top: 1px solid var(--border); padding: 48px 24px; margin-top: 60px; }
     .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
-    .footer-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; }
-    .footer-brand svg { width: 20px; height: 20px; color: var(--accent-blue); }
-    .footer-text { color: var(--text-muted); font-size: 14px; }
+    .footer-brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
+    .footer-brand svg { width: 18px; height: 18px; }
+    .footer-text { color: var(--text-muted); font-size: 13px; }
     .footer-links { display: flex; gap: 24px; }
-    .footer-links a { color: var(--text-muted); font-size: 14px; }
+    .footer-links a { color: var(--text-muted); font-size: 13px; }
     .footer-links a:hover { color: var(--text-main); }
 
     @media (max-width: 900px) {
-      .diagram-container { flex-direction: column; gap: 30px; padding: 30px 20px; }
-      .diag-arrow { width: 2px; height: 40px; margin: 10px 0; }
-      .diag-arrow::after { right: -4px; top: auto; bottom: -2px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid var(--border); }
-      .diag-label { top: 50%; left: 20px; transform: translateY(-50%); }
-      .code-showcase { grid-template-columns: 1fr; }
+      .flow-container { flex-direction: column; gap: 40px; }
+      .flow-line { width: 2px; height: 40px; margin: 0; }
+      .flow-particle { width: 3px; height: 40px; top: 0; left: -1px; animation: particleFlowVert 2s infinite; background: linear-gradient(180deg, transparent, var(--blue)); }
+      @keyframes particleFlowVert { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+      .flow-label { top: 50%; left: 20px; transform: translateY(-50%); }
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-large { grid-column: span 1; }
       .nav-links { display: none; }
     }
   </style>
 </head>
 <body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
 
   <header>
     <div class="nav-container">
@@ -237,129 +253,149 @@
       </div>
       <nav class="nav-links">
         <a href="#features">Features</a>
-        <a href="#how-it-works">How it Works</a>
-        <a href="cli-integrations.html">CLI Agents</a>
-        <a href="https://github.com/cosen-ai/cosen" class="btn-nav">GitHub</a>
+        <a href="cli-integrations.html">CLI Integrations</a>
+        <a href="https://github.com/cosen-ai/cosen" class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">GitHub</a>
       </nav>
     </div>
   </header>
 
   <section class="hero">
-    <h1>Control your <span class="text-gradient">AI surface area</span></h1>
-    <p>Cosen is an enterprise-grade, local-first gateway. Point any OpenAI-compatible or Anthropic model at it, and every call is automatically priced, traced, and scanned for security.</p>
-    <div class="hero-ctas">
-      <a href="#quickstart" class="btn btn-primary">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        Get Started
-      </a>
+    <a href="https://github.com/cosen-ai/cosen" class="badge animate-fade-up">
+      <span style="color: var(--emerald)">●</span> Cosen 0.2 is now available →
+    </a>
+    <h1 class="animate-fade-up delay-1">Control your AI surface area</h1>
+    <p class="animate-fade-up delay-2">An enterprise-grade, local-first gateway. Point any OpenAI-compatible or Anthropic model at it, and every call is automatically priced, traced, and scanned.</p>
+    <div class="hero-ctas animate-fade-up delay-3">
+      <a href="#quickstart" class="btn btn-primary">Get Started</a>
       <a href="https://github.com/cosen-ai/cosen" class="btn btn-secondary">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
         View Source
       </a>
     </div>
   </section>
 
-  <section class="diagram-section">
-    <div class="diagram-container">
-      <div class="diag-node">
+  <section class="flow-section animate-fade-up delay-3">
+    <div class="flow-container">
+      <div class="flow-node">
         <h4>Your Application</h4>
-        <ul class="diag-list">
-          <li>Python / Node SDKs</li>
-          <li>CLI Agents (Codex, Aider)</li>
-          <li>Cursor Editor (MCP)</li>
+        <ul class="flow-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> Python / Node SDKs</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> CLI Agents (Aider, Codex)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Cursor Editor (MCP)</li>
         </ul>
       </div>
       
-      <div class="diag-arrow"><span class="diag-label">/v1/chat</span></div>
+      <div class="flow-line">
+        <div class="flow-particle"></div>
+        <span class="flow-label">/v1/chat</span>
+      </div>
       
-      <div class="diag-node core">
+      <div class="flow-node core">
         <h4>Cosen Gateway</h4>
-        <ul class="diag-list">
-          <li><span style="color:var(--accent-rose)">●</span> Security Scanners</li>
-          <li><span style="color:var(--accent-teal)">●</span> Budget Enforcement</li>
-          <li><span style="color:var(--accent-blue)">●</span> SQLite Trace Store</li>
+        <ul class="flow-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Security Scanners</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Budget Enforcement</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg> SQLite Trace Store</li>
         </ul>
       </div>
 
-      <div class="diag-arrow"><span class="diag-label">Proxy</span></div>
+      <div class="flow-line">
+        <div class="flow-particle" style="animation-delay: 1s;"></div>
+        <span class="flow-label">Proxy</span>
+      </div>
       
-      <div class="diag-node">
+      <div class="flow-node">
         <h4>LLM Providers</h4>
-        <ul class="diag-list">
-          <li>OpenAI / Anthropic</li>
-          <li>Local (Ollama, vLLM)</li>
-          <li>OpenRouter / Groq</li>
+        <ul class="flow-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg> OpenAI / Anthropic</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg> Local (Ollama, vLLM)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> OpenRouter / Groq</li>
         </ul>
       </div>
     </div>
   </section>
 
-  <section class="integrations">
-    <p>Seamlessly integrates with your existing stack</p>
-    <div class="logo-cloud">
-      <div class="logo-item">OpenAI</div>
-      <div class="logo-item">Anthropic</div>
-      <div class="logo-item">Cursor</div>
-      <div class="logo-item">Ollama</div>
-      <div class="logo-item">Groq</div>
+  <section id="features" class="bento-section">
+    <h2 class="section-title">One suite, three critical jobs</h2>
+    <p class="section-sub">Stop running disconnected tools. Cosen puts cost, observability, and security on the exact same request path.</p>
+    
+    <div class="bento-grid">
+      <div class="bento-card bento-large spotlight-card">
+        <div class="spotlight"></div>
+        <div class="bento-icon" style="color: var(--rose); border-color: rgba(244,63,94,0.3); background: rgba(244,63,94,0.1);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
+        <div class="bento-content">
+          <h3>On-Path Security</h3>
+          <p>Deterministic scanners intercept requests and responses. Block or redact secrets, PII, prompt injections, and system-prompt leaks instantly—without requiring an extra LLM-as-judge.</p>
+          <div class="bento-visual">
+            <div class="log-line"><span class="log-time">10:42:01</span><span class="log-level info">[SCAN]</span><span>Analyzing input payload...</span></div>
+            <div class="log-line"><span class="log-time">10:42:01</span><span class="log-level crit">[BLOCK]</span><span>Prompt injection detected: "Ignore previous instructions..."</span></div>
+            <div class="log-line"><span class="log-time">10:42:01</span><span class="log-level warn">[403]</span><span>Request terminated before reaching upstream.</span></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bento-card spotlight-card">
+        <div class="spotlight"></div>
+        <div class="bento-icon" style="color: var(--emerald); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.1);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </div>
+        <div class="bento-content">
+          <h3>Cost & Budgets</h3>
+          <p>Track token usage × model price, tagged by feature, project, and user. Set daily kill-switches to prevent runaway agents from burning your budget.</p>
+          <div class="bento-visual" style="margin-top:auto">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>support-bot</span><span style="color:var(--emerald)">$12.40 / $20</span></div>
+            <div style="width:100%; height:6px; background:#1a1a1a; border-radius:3px; overflow:hidden;"><div style="width:62%; height:100%; background:var(--emerald);"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card bento-large spotlight-card" style="grid-column: span 3;">
+        <div class="spotlight"></div>
+        <div style="display: flex; gap: 40px; align-items: center; height: 100%;">
+          <div class="bento-content" style="flex: 1;">
+            <div class="bento-icon" style="color: var(--blue); border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.1);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+            </div>
+            <h3>Observability without the SaaS</h3>
+            <p>Zero-instrumentation tracing. View model mix, latency, and spend by feature in a local web dashboard or via CLI reports. Data lives in a local SQLite database—no cloud account required.</p>
+          </div>
+          <div class="bento-visual" style="flex: 1.5; margin: 0; background: transparent; border: 0; padding: 0;">
+            <div style="background: #000; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;">
+              <div style="border-bottom: 1px solid var(--border); padding: 8px 16px; display: flex; gap: 16px; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+                <span style="flex: 1">Feature</span><span style="width: 80px">Model</span><span style="width: 60px">Status</span><span style="width: 60px; text-align: right">Cost</span>
+              </div>
+              <div style="padding: 12px 16px; display: flex; gap: 16px; border-bottom: 1px solid rgba(255,255,255,0.02);">
+                <span style="flex: 1; color: var(--text-main)">invoice-extract</span><span style="width: 80px">claude-3.5</span><span style="width: 60px; color: var(--emerald)">ok</span><span style="width: 60px; text-align: right">$0.014</span>
+              </div>
+              <div style="padding: 12px 16px; display: flex; gap: 16px; border-bottom: 1px solid rgba(255,255,255,0.02);">
+                <span style="flex: 1; color: var(--text-main)">support-bot</span><span style="width: 80px">gpt-4o-mini</span><span style="width: 60px; color: var(--rose)">blocked</span><span style="width: 60px; text-align: right">$0.000</span>
+              </div>
+              <div style="padding: 12px 16px; display: flex; gap: 16px;">
+                <span style="flex: 1; color: var(--text-main)">rag-faq</span><span style="width: 80px">llama3.2</span><span style="width: 60px; color: var(--emerald)">ok</span><span style="width: 60px; text-align: right">$0.000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section id="features" class="section">
-    <div class="section-header">
-      <h2>One suite, three critical jobs</h2>
-      <p>Stop running disconnected tools. Cosen puts cost, observability, and security on the exact same request path.</p>
-    </div>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon icon-cost">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-        </div>
-        <h3>Cost & Budgets</h3>
-        <p>Track token usage × model price, tagged by feature, project, and user. Set daily kill-switches to prevent runaway agents from burning your budget.</p>
+  <section id="quickstart" class="terminal-section">
+    <h2 class="section-title">Drop-in replacement</h2>
+    <p class="section-sub">Cosen speaks native OpenAI and Anthropic protocols. Just change your Base URL and add custom attribution headers.</p>
+    
+    <div class="terminal">
+      <div class="term-header">
+        <div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div>
+        <div class="term-title">app.py</div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon icon-obs">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
-        </div>
-        <h3>Observability</h3>
-        <p>Zero-instrumentation tracing. View model mix, latency, and spend by feature in a local web dashboard or via CLI reports. No SaaS account required.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon icon-sec">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-        </div>
-        <h3>On-Path Security</h3>
-        <p>Deterministic scanners intercept requests and responses. Block or redact secrets, PII, prompt injections, and system-prompt leaks instantly.</p>
-      </div>
-    </div>
-  </section>
-
-  <section id="how-it-works" class="section">
-    <div class="code-showcase">
-      <div>
-        <h2>Drop-in Replacement</h2>
-        <p style="color: var(--text-muted); font-size: 18px; margin-bottom: 24px;">
-          Cosen speaks native OpenAI and Anthropic protocols. Just change your Base URL and add custom attribution headers.
-        </p>
-        <ul class="diag-list" style="font-size: 16px; margin-bottom: 32px;">
-          <li style="margin-bottom: 12px;"><strong>Model-agnostic:</strong> No vendor SDK lock-in.</li>
-          <li style="margin-bottom: 12px;"><strong>Local-first:</strong> SQLite on disk, no mandatory cloud.</li>
-          <li style="margin-bottom: 12px;"><strong>Product attribution:</strong> Tag calls with <code>X-COS-Feature</code>.</li>
-        </ul>
-        <a href="cli-integrations.html" class="btn btn-secondary">View CLI Agent Integrations →</a>
-      </div>
-      <div class="mac-window">
-        <div class="mac-header">
-          <div class="mac-dot dot-r"></div>
-          <div class="mac-dot dot-y"></div>
-          <div class="mac-dot dot-g"></div>
-        </div>
-        <div class="mac-body">
+      <div class="term-body">
 <span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
 
 <span class="token-comment"># 1. Point SDK at local Cosen gateway</span>
-client = <span class="token-function">OpenAI</span>(
+client = <span class="token-class">OpenAI</span>(
     base_url=<span class="token-string">"http://127.0.0.1:8080/v1"</span>,
     api_key=<span class="token-string">"not-needed-in-mock"</span>
 )
@@ -373,37 +409,12 @@ response = client.chat.completions.<span class="token-function">create</span>(
         <span class="token-string">"X-COS-Project"</span>: <span class="token-string">"acme-corp"</span>
     }
 )
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="quickstart" class="section" style="text-align:center; max-width: 800px;">
-    <h2>Ready to self-host?</h2>
-    <p style="color: var(--text-muted); font-size: 18px; margin-bottom: 40px;">Get the code, run the mock server, and start tracing your first AI calls in minutes.</p>
-    
-    <div class="mac-window" style="text-align: left; margin-bottom: 40px;">
-      <div class="mac-header">
-        <div class="mac-dot dot-r"></div>
-        <div class="mac-dot dot-y"></div>
-        <div class="mac-dot dot-g"></div>
-      </div>
-      <div class="mac-body">
-<span class="token-comment"># Clone and install</span>
-git clone https://github.com/cosen-ai/cosen.git
-cd cosen
-python -m pip install -e .
-
-<span class="token-comment"># Initialize policy and seed demo data</span>
-cosen init
-cosen demo
-
-<span class="token-comment"># Start the gateway + web UI</span>
-cosen serve --mock
       </div>
     </div>
     
-    <a class="btn btn-primary" href="https://github.com/cosen-ai/cosen">View Documentation on GitHub</a>
+    <div style="text-align: center; margin-top: 40px;">
+      <a href="cli-integrations.html" class="btn btn-secondary">View CLI Agent Integrations →</a>
+    </div>
   </section>
 
   <footer>
@@ -423,5 +434,17 @@ cosen serve --mock
     </div>
   </footer>
 
+  <script>
+    // Spotlight effect for bento cards
+    document.querySelectorAll('.spotlight-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+    });
+  </script>
 </body>
 </html>

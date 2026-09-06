@@ -1,105 +1,114 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="description" content="Use Cosen with Codex, Claude CLI, llm, aider, and other LLM CLI agents."/>
   <title>Cosen | CLI Agent Integrations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-base: #030712;
-      --bg-surface: #111827;
-      --bg-surface-hover: #1f2937;
-      --border: #374151;
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
-      --accent-blue: #3b82f6;
-      --accent-blue-hover: #2563eb;
-      --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      --bg-base: #000000;
+      --bg-card: #0a0a0a;
+      --bg-card-hover: #111111;
+      --border: rgba(255, 255, 255, 0.1);
+      --border-hover: rgba(255, 255, 255, 0.2);
+      --text-main: #ededed;
+      --text-muted: #a1a1aa;
+      --accent: #ffffff;
+      --blue: #3b82f6;
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body { 
-      margin: 0; 
       background-color: var(--bg-base); 
       color: var(--text-main); 
       font-family: var(--font-sans); 
       line-height: 1.6; 
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    a { color: var(--accent-blue); text-decoration: none; transition: color 0.2s; }
-    a:hover { color: #60a5fa; }
+    /* Grid Background */
+    .bg-grid {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse at top, black 0%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at top, black 0%, transparent 70%);
+    }
+
+    a { color: var(--text-main); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--blue); }
 
     /* Header */
     header { 
-      position: sticky; 
-      top: 0; width: 100%; 
-      z-index: 50; 
-      background: rgba(3, 7, 18, 0.8); 
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      position: sticky; top: 0; width: 100%; z-index: 50; 
+      background: rgba(0, 0, 0, 0.5); 
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
     }
     .nav-container { 
-      max-width: 900px; 
-      margin: 0 auto; 
-      padding: 16px 24px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
+      max-width: 900px; margin: 0 auto; padding: 16px 24px; 
+      display: flex; align-items: center; justify-content: space-between; 
     }
-    .brand { 
-      font-weight: 700; 
-      font-size: 16px; 
-      letter-spacing: 0.05em; 
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .brand svg { width: 20px; height: 20px; color: var(--accent-blue); }
+    .brand { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.02em; }
+    .brand svg { width: 22px; height: 22px; color: var(--text-main); }
     .back-link { color: var(--text-muted); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 4px; }
     .back-link:hover { color: var(--text-main); }
 
     /* Main Content */
-    main { max-width: 800px; margin: 0 auto; padding: 60px 24px 100px; }
-    h1 { font-size: 36px; font-weight: 800; margin: 0 0 16px; letter-spacing: -0.02em; }
-    .lead { color: var(--text-muted); font-size: 18px; margin-bottom: 48px; }
+    main { max-width: 800px; margin: 0 auto; padding: 80px 24px 100px; }
+    h1 { 
+      font-size: clamp(32px, 5vw, 48px); font-weight: 800; margin: 0 0 16px; letter-spacing: -0.03em; 
+      background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .lead { color: var(--text-muted); font-size: 18px; margin-bottom: 60px; line-height: 1.5; }
     
-    h2 { font-size: 24px; margin-top: 48px; margin-bottom: 16px; font-weight: 600; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    h2 { font-size: 24px; margin-top: 60px; margin-bottom: 20px; font-weight: 600; letter-spacing: -0.01em; }
     p { color: var(--text-muted); margin-bottom: 20px; }
     
     ul { color: var(--text-muted); padding-left: 20px; margin-bottom: 24px; }
     li { margin: 8px 0; }
     li strong { color: var(--text-main); }
 
-    /* Code Windows */
-    .mac-window {
-      background: #0d1117; border: 1px solid var(--border); border-radius: 12px;
-      overflow: hidden; margin: 24px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    /* Terminal Windows */
+    .terminal {
+      background: #000; border: 1px solid var(--border); border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4); overflow: hidden; margin: 24px 0 40px;
     }
-    .mac-header {
-      background: #1f2937; padding: 12px 16px; display: flex; gap: 8px;
-      border-bottom: 1px solid var(--border);
+    .term-header {
+      background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border);
+      padding: 12px 16px; display: flex; align-items: center; gap: 8px;
     }
-    .mac-dot { width: 12px; height: 12px; border-radius: 50%; }
-    .dot-r { background: #ff5f56; }
-    .dot-y { background: #ffbd2e; }
-    .dot-g { background: #27c93f; }
-    .mac-body { padding: 20px; font-family: var(--font-mono); font-size: 14px; overflow-x: auto; color: #e5e7eb; }
+    .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .term-dot:nth-child(1) { background: #ff5f56; }
+    .term-dot:nth-child(2) { background: #ffbd2e; }
+    .term-dot:nth-child(3) { background: #27c93f; }
+    .term-title { margin: 0 auto; font-size: 12px; color: var(--text-muted); font-family: var(--font-sans); }
+    .term-body { padding: 20px 24px; font-family: var(--font-mono); font-size: 13px; line-height: 1.7; overflow-x: auto; }
     .token-comment { color: #6b7280; }
-    .token-keyword { color: #c678dd; }
-    .token-string { color: #98c379; }
+    .token-keyword { color: #ff7b72; }
+    .token-string { color: #a5d6ff; }
+    .token-cmd { color: #d2a8ff; }
 
     /* Footer */
-    footer { background: var(--bg-surface); padding: 40px 24px; border-top: 1px solid var(--border); }
+    footer { border-top: 1px solid var(--border); padding: 48px 24px; }
     .footer-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
-    .footer-text { color: var(--text-muted); font-size: 14px; }
+    .footer-text { color: var(--text-muted); font-size: 13px; }
   </style>
 </head>
 <body>
+  
+  <div class="bg-grid"></div>
 
   <header>
     <div class="nav-container">
@@ -122,56 +131,60 @@
     <p>Cosen exposes both the OpenAI-compatible <code>/v1/chat/completions</code> and the Anthropic <code>/v1/messages</code> endpoints. CLI agents that talk to either of those formats can use Cosen as a local gateway.</p>
 
     <h2>OpenAI Codex CLI</h2>
-    <div class="mac-window">
-      <div class="mac-header">
-        <div class="mac-dot dot-r"></div><div class="mac-dot dot-y"></div><div class="mac-dot dot-g"></div>
+    <div class="terminal">
+      <div class="term-header">
+        <div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div>
+        <div class="term-title">bash</div>
       </div>
-      <div class="mac-body">
+      <div class="term-body">
 <span class="token-comment"># Start Cosen first</span>
-cosen serve --mock
+<span class="token-cmd">cosen</span> serve --mock
 
 <span class="token-comment"># In another terminal</span>
 <span class="token-keyword">export</span> OPENAI_BASE_URL=http://127.0.0.1:8080/v1
-codex <span class="token-string">"refactor this function"</span>
+<span class="token-cmd">codex</span> <span class="token-string">"refactor this function"</span>
       </div>
     </div>
 
     <h2>Anthropic Claude CLI</h2>
-    <div class="mac-window">
-      <div class="mac-header">
-        <div class="mac-dot dot-r"></div><div class="mac-dot dot-y"></div><div class="mac-dot dot-g"></div>
+    <div class="terminal">
+      <div class="term-header">
+        <div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div>
+        <div class="term-title">bash</div>
       </div>
-      <div class="mac-body">
+      <div class="term-body">
 <span class="token-comment"># Start Cosen first</span>
-cosen serve --mock
+<span class="token-cmd">cosen</span> serve --mock
 
 <span class="token-comment"># In another terminal</span>
 <span class="token-keyword">export</span> ANTHROPIC_BASE_URL=http://127.0.0.1:8080/v1
-claude <span class="token-string">"explain this code"</span>
+<span class="token-cmd">claude</span> <span class="token-string">"explain this code"</span>
       </div>
     </div>
     <p>Claude CLI sends Anthropic Messages API requests. Cosen translates them internally, runs security scanners, checks budgets, and converts the response back seamlessly.</p>
 
     <h2>Simon Willison's <code>llm</code></h2>
-    <div class="mac-window">
-      <div class="mac-header">
-        <div class="mac-dot dot-r"></div><div class="mac-dot dot-y"></div><div class="mac-dot dot-g"></div>
+    <div class="terminal">
+      <div class="term-header">
+        <div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div>
+        <div class="term-title">bash</div>
       </div>
-      <div class="mac-body">
+      <div class="term-body">
 <span class="token-comment"># Register Cosen as an OpenAI-compatible endpoint</span>
-llm -o base_url http://127.0.0.1:8080/v1 -m gpt-4o-mini <span class="token-string">"what is the refund window?"</span>
+<span class="token-cmd">llm</span> -o base_url http://127.0.0.1:8080/v1 -m gpt-4o-mini <span class="token-string">"what is the refund window?"</span>
       </div>
     </div>
     <p>Use <code>llm</code> templates or aliases to make Cosen the default for daily use.</p>
 
     <h2>aider</h2>
-    <div class="mac-window">
-      <div class="mac-header">
-        <div class="mac-dot dot-r"></div><div class="mac-dot dot-y"></div><div class="mac-dot dot-g"></div>
+    <div class="terminal">
+      <div class="term-header">
+        <div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div>
+        <div class="term-title">bash</div>
       </div>
-      <div class="mac-body">
+      <div class="term-body">
 <span class="token-keyword">export</span> OPENAI_API_BASE=http://127.0.0.1:8080/v1
-aider --model gpt-4o-mini
+<span class="token-cmd">aider</span> --model gpt-4o-mini
       </div>
     </div>
 
