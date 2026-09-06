@@ -334,7 +334,7 @@ Do these in order. Do not skip to a rewrite unless asked.
 7. **Embeddings + other OpenAI routes** if needed (`/v1/embeddings`)
 8. **Auth on the web app** when bound to `0.0.0.0` (token or basic auth)
 9. **OpenTelemetry export** optional sidecar
-10. **GitHub Action** — fail PR if security blocks or budget fixture fails
+10. ✅ **GitHub Action** — pytest + scanner contract + mock gateway smoke on every PR
 11. **Better tokenizers** — optional tiktoken; keep 4-char fallback
 12. **Replace stdlib HTTP server** with FastAPI/uvicorn only if streaming + uploads demand it
 13. EE later: SSO, orgs, multi-tenant cloud

@@ -49,10 +49,13 @@ Tag requests with `X-COS-Feature`, `X-COS-Project`, `X-COS-User`, and
 
 1. Open an issue or discussion first for large changes.
 2. Keep PRs small and focused.
-3. Ensure `pytest` passes and the mock server still starts:
+3. Ensure `pytest` and the CI smoke checks pass:
    ```bash
+   python -m pytest tests/ -q
+   python tests/ci_smoke.py
    cosen serve --mock
    curl -s http://127.0.0.1:8080/api/health
    ```
+   Pull requests run the same checks in GitHub Actions (`.github/workflows/ci.yml`).
 4. Reference the issue in the PR description.
 5. Wait for maintainer review.
