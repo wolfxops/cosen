@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cosen"
-version = "0.2.1"
+version = "0.2.2"
 description = "Cosen — locally hosted, LLM-agnostic cost, observability, and security suite."
 readme = "README.md"
 requires-python = ">=3.10"

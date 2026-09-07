@@ -130,9 +130,45 @@ cosen report --hours 24    Cost / obs / security summary
 cosen scan --text "..."    Scan a prompt or output
 cosen cost --model gpt-4o-mini --input-tokens 1200 --output-tokens 400 --calls 10000
 cosen mcp                  Start the MCP server for Cursor
+cosen integrate list       CLI / SDK / OWASP / Sonar / Prometheus catalog
+cosen integrate show <id> Print drop-in setup for a tool
+cosen export sarif|owasp|otel|prometheus
 ```
 
 `cos` is still an alias of the same entrypoint.
+
+## Integrations (CLI, SDK, and platform tools)
+
+Cosen is meant to sit in front of **every** LLM CLI and SDK your org already uses, then export the same cost / obs / security signals into the tools security and platform teams already run.
+
+```bash
+cosen integrate list
+cosen integrate show openai-python
+cosen integrate show sonarqube
+cosen export sarif --hours 24 --out reports/cosen-security.sarif
+cosen export owasp --hours 24 --out reports/cosen-owasp.json
+```
+
+| Tool | Pillar | How Cosen integrates |
+|---|---|---|
+| Codex / Claude CLI / `llm` / aider / Continue | all | Point base URL at `http://127.0.0.1:8080/v1` |
+| OpenAI / Anthropic / LangChain / LlamaIndex SDKs | all | Drop-in `base_url` / `api_base` (see `examples/`) |
+| Cursor MCP | all | `cosen mcp` |
+| **OWASP LLM Top 10** | security | `cosen export owasp` maps scanners → LLM01–LLM10 |
+| **SARIF 2.1.0** | security | Portable findings for scanners and dashboards |
+| **SonarQube / SonarCloud** | security | `sonar.sarifReportPaths=reports/cosen-security.sarif` |
+| **GitHub Code Scanning** | security | Upload SARIF (`examples/github-action-cosen-sarif.yml`) |
+| **Semgrep** | security | Pair SAST SARIF with Cosen runtime SARIF in CI |
+| **Prometheus / Grafana** | cost + obs | Scrape `GET /metrics` |
+| **OpenTelemetry** | obs | `cosen export otel` → OTLP/JSON-shaped spans |
+
+Live HTTP surfaces while `cosen serve` is running:
+
+- `GET /metrics`
+- `GET /api/integrations`
+- `GET /api/export/sarif|owasp|otel`
+
+Full catalog: [docs/integrations.html](docs/integrations.html).
 
 ## Cursor integration (MCP)
 
@@ -195,9 +231,29 @@ export OPENAI_API_BASE=http://127.0.0.1:8080/v1
 aider --model gpt-4o-mini
 ```
 
+### SDKs (OpenAI, Anthropic, LangChain, LlamaIndex)
+
+```bash
+cosen integrate show openai-python
+cosen integrate show langchain
+# or copy from examples/
+```
+
+Point any OpenAI-compatible client at `http://127.0.0.1:8080/v1` and set `X-COS-Feature` / `X-COS-Project` so spend rolls up by product feature.
+
+### Platform visibility (OWASP, SonarQube, Prometheus, …)
+
+```bash
+cosen integrate list --category security
+cosen export sarif --hours 24 --out reports/cosen-security.sarif
+cosen export owasp --hours 24
+```
+
+See [docs/integrations.html](docs/integrations.html) for SonarQube SARIF import, GitHub Code Scanning, Semgrep pairing, Prometheus scrape, and OpenTelemetry export.
+
 ### What gets traced
 
-Every CLI call goes through the same path: input scan, budget check, model call, output scan, trace, cost. You can see them in the web app or with `cosen report`.
+Every CLI or SDK call goes through the same path: input scan, budget check, model call, output scan, trace, cost. You can see them in the web app or with `cosen report`.
 
 ## Policy
 

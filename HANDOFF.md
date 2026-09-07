@@ -139,7 +139,7 @@ cosen/
   tests/test_security_cost.py
   cosen/
     __init__.py             # __version__ = 0.2.1
-    cli.py                  # init, serve, report, scan, demo, cost
+    cli.py                  # init, serve, report, scan, demo, cost, mcp, integrate, export
     config.py               # load cosen.yaml, env ${VAR:-default}
     gateway.py              # HTTP server: SPA + API + /v1 proxy (OpenAI + Anthropic)
     store.py                # SQLite traces, events, providers
@@ -147,10 +147,12 @@ cosen/
     security.py             # deterministic scanners
     textutil.py             # message flattening, previews
     dashboard.py            # OLD static HTML summary — SPA replaced it
+    integrations/           # CLI/SDK catalog + OWASP/SARIF/Prometheus/OTEL exporters
     data/pricing.yaml
     policies/default.yaml
     web/index.html          # local web app
   docs/                     # GitHub Pages public site
+  examples/                 # SDK drop-ins, Prometheus, Sonar, GitHub Action
 ```
 
 Runtime data (gitignored): `.cosen/cosen.db`.
@@ -207,6 +209,9 @@ App API:
 - `POST /api/scan` `{text, side: input|output}`
 - `GET /api/pricing`
 - `GET /api/policy`
+- `GET /metrics` · `GET /api/metrics`
+- `GET /api/integrations`
+- `GET /api/export/sarif` · `/api/export/owasp` · `/api/export/otel`
 - `POST /cos/scan` (legacy)
 
 Errors:
@@ -300,9 +305,24 @@ cosen demo [--port]
 cosen report [--hours 24] [--json]
 cosen scan [--text] [--file] [--side input|output]
 cosen cost --model NAME --input-tokens N --output-tokens N [--calls N]
+cosen mcp
+cosen integrate list|show|apply
+cosen export sarif|owasp|otel|prometheus
 ```
 
 `cos` is an alias of the same entrypoint for backward compatibility.
+
+---
+
+## 13b. Platform integrations
+
+| Target | Command / endpoint |
+|---|---|
+| CLI/SDK catalog | `cosen integrate list` |
+| OWASP LLM Top 10 | `cosen export owasp` · `GET /api/export/owasp` |
+| SARIF (SonarQube / GitHub) | `cosen export sarif` · `GET /api/export/sarif` |
+| Prometheus | `GET /metrics` · `cosen export prometheus` |
+| OpenTelemetry JSON | `cosen export otel` · `GET /api/export/otel` |
 
 ---
 
@@ -333,8 +353,9 @@ Do these in order. Do not skip to a rewrite unless asked.
 6. **Provider health check** — `GET {base}/models` from the UI
 7. **Embeddings + other OpenAI routes** if needed (`/v1/embeddings`)
 8. **Auth on the web app** when bound to `0.0.0.0` (token or basic auth)
-9. **OpenTelemetry export** optional sidecar
-10. ✅ **GitHub Action** — pytest + scanner contract + mock gateway smoke on every PR
+9. ✅ **OpenTelemetry export** — lightweight OTLP/JSON via `cosen export otel` / `/api/export/otel` (no heavy SDK)
+10. ✅ **GitHub Action** — pytest + scanner contract + mock gateway smoke on every PR; example SARIF upload in `examples/github-action-cosen-sarif.yml`
+10b. ✅ **OWASP / SonarQube / Prometheus / Semgrep pairing** — exporters + integrate catalog
 11. **Better tokenizers** — optional tiktoken; keep 4-char fallback
 12. **Replace stdlib HTTP server** with FastAPI/uvicorn only if streaming + uploads demand it
 13. EE later: SSO, orgs, multi-tenant cloud

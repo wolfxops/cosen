@@ -152,6 +152,89 @@ def _cmd_mcp(_args: argparse.Namespace) -> int:
     return mcp_main()
 
 
+def _cmd_integrate(args: argparse.Namespace) -> int:
+    from .integrations import apply_integration, list_integrations, render_integration
+    from .integrations.catalog import INTEGRATIONS
+
+    action = args.integrate_cmd
+    if action == "list":
+        rows = list_integrations(category=args.category, pillar=args.pillar)
+        if args.json:
+            print(json.dumps(rows, indent=2))
+            return 0
+        print(f"{'ID':<22} {'CATEGORY':<14} {'PILLARS':<28} NAME")
+        for row in rows:
+            pillars = ",".join(row.get("pillars") or [])
+            print(f"{row['id']:<22} {row['category']:<14} {pillars:<28} {row['name']}")
+        print(f"\n{len(rows)} integrations. Show one with: cosen integrate show <id>")
+        return 0
+    if action == "show":
+        try:
+            text = render_integration(args.target)
+        except KeyError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+        print(text)
+        return 0
+    if action == "apply":
+        try:
+            result = apply_integration(args.target, force=bool(args.force))
+        except KeyError:
+            print(f"unknown integration {args.target!r}", file=sys.stderr)
+            print("known:", ", ".join(sorted(INTEGRATIONS)), file=sys.stderr)
+            return 2
+        print(result["message"])
+        if not result.get("wrote"):
+            print(result.get("snippet") or "")
+        return 0
+    print("use: cosen integrate list|show|apply", file=sys.stderr)
+    return 2
+
+
+def _write_export(path: str | None, payload: str | dict) -> None:
+    text = payload if isinstance(payload, str) else json.dumps(payload, indent=2)
+    if path:
+        out = Path(path)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(text if text.endswith("\n") else text + "\n")
+        print(f"wrote {out}")
+    else:
+        print(text)
+
+
+def _cmd_export(args: argparse.Namespace) -> int:
+    from .integrations.otel import otel_traces_export
+    from .integrations.owasp import owasp_llm_report
+    from .integrations.prometheus import prometheus_metrics
+    from .integrations.sarif import findings_to_sarif, traces_to_sarif
+
+    kind = args.export_cmd
+    hours = int(args.hours)
+    if kind == "sarif":
+        if args.text or args.file:
+            if args.file:
+                text = Path(args.file).read_text()
+            else:
+                text = args.text or ""
+            findings = security.scan_text(text, side=args.side)
+            payload = findings_to_sarif(security.findings_as_dict(findings), uri="cosen://scan")
+        else:
+            payload = traces_to_sarif(store.query_traces(limit=500, since_hours=hours), hours=hours)
+        _write_export(args.out, payload)
+        return 0
+    if kind == "owasp":
+        _write_export(args.out, owasp_llm_report(hours=hours))
+        return 0
+    if kind == "otel":
+        _write_export(args.out, otel_traces_export(hours=hours, limit=int(args.limit)))
+        return 0
+    if kind == "prometheus":
+        _write_export(args.out, prometheus_metrics(hours=hours))
+        return 0
+    print("use: cosen export sarif|owasp|otel|prometheus", file=sys.stderr)
+    return 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="cosen",
@@ -196,6 +279,50 @@ def build_parser() -> argparse.ArgumentParser:
 
     mcp_p = sub.add_parser("mcp", help="Start the MCP server for Cursor integration")
     mcp_p.set_defaults(func=_cmd_mcp)
+
+    integrate = sub.add_parser(
+        "integrate",
+        help="List / show / apply CLI, SDK, and platform integrations",
+    )
+    integrate_sub = integrate.add_subparsers(dest="integrate_cmd", required=True)
+    i_list = integrate_sub.add_parser("list", help="List integrations")
+    i_list.add_argument("--category", choices=["cli", "sdk", "editor", "security", "observability", "cost"])
+    i_list.add_argument("--pillar", choices=["cost", "observability", "security"])
+    i_list.add_argument("--json", action="store_true")
+    i_list.set_defaults(func=_cmd_integrate)
+    i_show = integrate_sub.add_parser("show", help="Print setup instructions")
+    i_show.add_argument("target")
+    i_show.set_defaults(func=_cmd_integrate)
+    i_apply = integrate_sub.add_parser("apply", help="Write example config/snippet files")
+    i_apply.add_argument("target")
+    i_apply.add_argument("--force", action="store_true")
+    i_apply.set_defaults(func=_cmd_integrate)
+
+    export = sub.add_parser(
+        "export",
+        help="Export SARIF / OWASP / OpenTelemetry / Prometheus views",
+    )
+    export_sub = export.add_subparsers(dest="export_cmd", required=True)
+    e_sarif = export_sub.add_parser("sarif", help="SARIF for SonarQube / GitHub Code Scanning")
+    e_sarif.add_argument("--hours", type=int, default=24)
+    e_sarif.add_argument("--text", help="Scan this text instead of stored traces")
+    e_sarif.add_argument("--file", help="Scan this file instead of stored traces")
+    e_sarif.add_argument("--side", choices=["input", "output"], default="input")
+    e_sarif.add_argument("--out", "-o")
+    e_sarif.set_defaults(func=_cmd_export)
+    e_owasp = export_sub.add_parser("owasp", help="OWASP LLM Top 10 coverage report")
+    e_owasp.add_argument("--hours", type=int, default=24)
+    e_owasp.add_argument("--out", "-o")
+    e_owasp.set_defaults(func=_cmd_export)
+    e_otel = export_sub.add_parser("otel", help="OpenTelemetry-compatible JSON spans")
+    e_otel.add_argument("--hours", type=int, default=24)
+    e_otel.add_argument("--limit", type=int, default=200)
+    e_otel.add_argument("--out", "-o")
+    e_otel.set_defaults(func=_cmd_export)
+    e_prom = export_sub.add_parser("prometheus", help="Prometheus text metrics")
+    e_prom.add_argument("--hours", type=int, default=24)
+    e_prom.add_argument("--out", "-o")
+    e_prom.set_defaults(func=_cmd_export)
     return parser
 
 
