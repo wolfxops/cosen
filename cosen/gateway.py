@@ -222,6 +222,59 @@ class CosenHandler(BaseHTTPRequestHandler):
         if path == "/api/policy":
             self._json(200, {"policy": self.policy})
             return
+        if path in ("/metrics", "/api/metrics"):
+            from .integrations.prometheus import prometheus_metrics
+
+            try:
+                hours = int((qs.get("hours") or ["24"])[0])
+            except ValueError:
+                hours = 24
+            body = prometheus_metrics(hours=hours).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        if path == "/api/integrations":
+            from .integrations import list_integrations
+
+            category = (qs.get("category") or [None])[0]
+            pillar = (qs.get("pillar") or [None])[0]
+            self._json(200, {"integrations": list_integrations(category=category, pillar=pillar)})
+            return
+        if path == "/api/export/sarif":
+            from .integrations.sarif import traces_to_sarif
+
+            try:
+                hours = int((qs.get("hours") or ["24"])[0])
+            except ValueError:
+                hours = 24
+            self._json(200, traces_to_sarif(store.query_traces(limit=500, since_hours=hours), hours=hours))
+            return
+        if path == "/api/export/owasp":
+            from .integrations.owasp import owasp_llm_report
+
+            try:
+                hours = int((qs.get("hours") or ["24"])[0])
+            except ValueError:
+                hours = 24
+            self._json(200, owasp_llm_report(hours=hours))
+            return
+        if path == "/api/export/otel":
+            from .integrations.otel import otel_traces_export
+
+            try:
+                hours = int((qs.get("hours") or ["24"])[0])
+            except ValueError:
+                hours = 24
+            try:
+                limit = int((qs.get("limit") or ["200"])[0])
+            except ValueError:
+                limit = 200
+            self._json(200, otel_traces_export(hours=hours, limit=limit))
+            return
         self._json(404, {"error": {"message": f"unknown path {path}", "type": "not_found"}})
 
     def do_POST(self) -> None:  # noqa: N802

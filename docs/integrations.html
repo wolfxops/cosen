@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="Cosen integrations for LLM CLIs, SDKs, OWASP, SonarQube, Prometheus, and OpenTelemetry."/>
+  <title>Cosen | Integrations Catalog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #071018;
+      --bg-2: #0d1a24;
+      --line: rgba(148, 197, 190, 0.18);
+      --text: #e7f2ef;
+      --muted: #93a8a3;
+      --accent: #3dd6c6;
+      --warn: #f0b429;
+      --font: "IBM Plex Sans", sans-serif;
+      --mono: "IBM Plex Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background:
+        radial-gradient(900px 420px at 10% -10%, rgba(61, 214, 198, 0.16), transparent 55%),
+        radial-gradient(700px 380px at 100% 0%, rgba(56, 120, 160, 0.18), transparent 50%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(10px);
+      background: rgba(7, 16, 24, 0.8);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav { max-width: 960px; margin: 0 auto; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-weight: 700; letter-spacing: -0.02em; }
+    .brand span { color: var(--accent); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    main { max-width: 960px; margin: 0 auto; padding: 64px 24px 96px; }
+    h1 { font-size: clamp(2rem, 4vw, 2.8rem); letter-spacing: -0.03em; margin-bottom: 12px; }
+    .lead { color: var(--muted); font-size: 1.1rem; max-width: 46rem; margin-bottom: 40px; }
+    h2 { margin: 48px 0 14px; font-size: 1.35rem; letter-spacing: -0.01em; }
+    p, li { color: var(--muted); }
+    ul { padding-left: 1.2rem; margin-bottom: 16px; }
+    li { margin: 6px 0; }
+    li strong { color: var(--text); }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 28px; font-size: 0.95rem; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--text); font-weight: 600; }
+    code, pre { font-family: var(--mono); }
+    code { color: var(--accent); }
+    pre {
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px 18px;
+      overflow-x: auto;
+      margin: 14px 0 28px;
+      color: #d7ebe6;
+      font-size: 0.85rem;
+    }
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-right: 4px;
+    }
+    footer { border-top: 1px solid var(--line); padding: 28px 24px; color: var(--muted); font-size: 0.85rem; }
+    .footer-inner { max-width: 960px; margin: 0 auto; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="brand">Co<span>sen</span></div>
+      <a href="index.html">← Home</a>
+    </div>
+  </header>
+  <main>
+    <h1>Integrations catalog</h1>
+    <p class="lead">
+      Use Cosen with every LLM CLI and SDK your developers already have, then export cost,
+      observability, and security into OWASP reports, SonarQube, GitHub Code Scanning,
+      Prometheus, Grafana, and OpenTelemetry.
+    </p>
+
+    <pre><span style="color:#6f8b86"># discover + apply</span>
+cosen integrate list
+cosen integrate show openai-python
+cosen integrate show sonarqube
+cosen export sarif --hours 24 --out reports/cosen-security.sarif
+cosen export owasp --hours 24 --out reports/cosen-owasp.json</pre>
+
+    <h2>LLM CLIs &amp; editors</h2>
+    <table>
+      <thead><tr><th>Tool</th><th>Setup</th></tr></thead>
+      <tbody>
+        <tr><td>OpenAI Codex CLI</td><td><code>export OPENAI_BASE_URL=http://127.0.0.1:8080/v1</code></td></tr>
+        <tr><td>Anthropic Claude CLI</td><td><code>export ANTHROPIC_BASE_URL=http://127.0.0.1:8080/v1</code> (Messages API)</td></tr>
+        <tr><td>Simon Willison <code>llm</code></td><td><code>llm -o base_url http://127.0.0.1:8080/v1 …</code></td></tr>
+        <tr><td>aider</td><td><code>export OPENAI_API_BASE=http://127.0.0.1:8080/v1</code></td></tr>
+        <tr><td>Continue.dev</td><td>OpenAI provider with <code>apiBase</code> → Cosen</td></tr>
+        <tr><td>Cursor</td><td><code>cosen mcp</code> + <code>.cursor/mcp.json</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2>Application SDKs</h2>
+    <p>Drop-in <code>base_url</code> / <code>api_base</code> — no vendor lock-in inside Cosen.</p>
+    <ul>
+      <li><strong>OpenAI Python / Node</strong> — <code>examples/openai_sdk.py</code>, <code>examples/openai_sdk.mjs</code></li>
+      <li><strong>Anthropic Python</strong> — Messages API via <code>examples/anthropic_sdk.py</code></li>
+      <li><strong>LangChain</strong> — <code>ChatOpenAI(base_url=…)</code></li>
+      <li><strong>LlamaIndex</strong> — <code>OpenAILike(api_base=…)</code></li>
+    </ul>
+    <p>Tag every call with <code>X-COS-Feature</code> and <code>X-COS-Project</code> so spend and blocks roll up by product feature.</p>
+
+    <h2>Security &amp; governance platforms</h2>
+    <table>
+      <thead><tr><th>Tool</th><th>Pillars</th><th>Integration</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>OWASP LLM Top 10</td>
+          <td><span class="pill">security</span></td>
+          <td><code>cosen export owasp</code> maps scanners to LLM01–LLM10 and reports coverage gaps.</td>
+        </tr>
+        <tr>
+          <td>SARIF 2.1.0</td>
+          <td><span class="pill">security</span></td>
+          <td>Portable findings format consumed by SonarQube, GitHub, VS Code.</td>
+        </tr>
+        <tr>
+          <td>SonarQube / SonarCloud</td>
+          <td><span class="pill">security</span></td>
+          <td>Set <code>sonar.sarifReportPaths=reports/cosen-security.sarif</code> (see <code>examples/sonar-project.properties.example</code>).</td>
+        </tr>
+        <tr>
+          <td>GitHub Code Scanning</td>
+          <td><span class="pill">security</span></td>
+          <td>Upload SARIF with <code>examples/github-action-cosen-sarif.yml</code>.</td>
+        </tr>
+        <tr>
+          <td>Semgrep</td>
+          <td><span class="pill">security</span></td>
+          <td>Keep Semgrep for SAST; add Cosen SARIF for runtime LLM findings in the same CI gate.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Cost &amp; observability platforms</h2>
+    <table>
+      <thead><tr><th>Tool</th><th>Pillars</th><th>Integration</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Prometheus</td>
+          <td><span class="pill">cost</span><span class="pill">obs</span><span class="pill">security</span></td>
+          <td>Scrape <code>GET /metrics</code> (<code>examples/prometheus-cosen.yml</code>).</td>
+        </tr>
+        <tr>
+          <td>Grafana</td>
+          <td><span class="pill">cost</span><span class="pill">obs</span></td>
+          <td>Prometheus datasource; panel <code>cosen_cost_usd_total</code>, <code>cosen_security_blocks_total</code>.</td>
+        </tr>
+        <tr>
+          <td>OpenTelemetry</td>
+          <td><span class="pill">obs</span><span class="pill">cost</span></td>
+          <td><code>cosen export otel</code> or <code>GET /api/export/otel</code> → OTLP/JSON-shaped spans.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>SonarQube quick path</h2>
+    <pre>cosen serve --mock
+# generate traffic, then:
+cosen export sarif --hours 24 --out reports/cosen-security.sarif
+
+# sonar-project.properties
+sonar.sarifReportPaths=reports/cosen-security.sarif
+sonar-scanner</pre>
+
+    <h2>OWASP mapping (runtime)</h2>
+    <ul>
+      <li><strong>LLM01 Prompt Injection</strong> — <code>prompt_injection</code>, <code>jailbreak</code></li>
+      <li><strong>LLM02 Sensitive Information Disclosure</strong> — <code>secrets</code>, <code>pii</code>, <code>system_leak</code></li>
+      <li><strong>LLM05 Improper Output Handling</strong> — output scan + redact/block</li>
+      <li><strong>LLM07 System Prompt Leakage</strong> — <code>system_leak</code></li>
+      <li><strong>LLM10 Unbounded Consumption</strong> — daily feature/project USD budgets</li>
+    </ul>
+    <p>Categories without an on-path signal (supply chain, poisoning, misinformation, …) are reported as gaps with companion-tool guidance (Semgrep, Trivy, eval harnesses).</p>
+
+    <h2>HTTP surfaces</h2>
+    <pre>GET /metrics
+GET /api/integrations
+GET /api/export/sarif?hours=24
+GET /api/export/owasp?hours=24
+GET /api/export/otel?hours=24</pre>
+  </main>
+  <footer>
+    <div class="footer-inner">
+      <div>Cosen Labs · Apache-2.0</div>
+      <div>
+        <a href="cli-integrations.html">CLI agents</a>
+        ·
+        <a href="https://github.com/wolfxops/cosen">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

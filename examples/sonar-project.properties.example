@@ -1,0 +1,4 @@
+sonar.projectKey=my-ai-app
+sonar.projectName=My AI App
+sonar.sources=.
+sonar.sarifReportPaths=reports/cosen-security.sarif

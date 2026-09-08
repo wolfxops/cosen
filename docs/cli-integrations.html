@@ -199,6 +199,20 @@
 
     <h2>Cursor and other editors</h2>
     <p>For Cursor, use the <a href="cursor-mcp.json">MCP config</a> to expose Cosen tools directly inside the editor. For other editors that support OpenAI-compatible endpoints, set their base URL to <code>http://127.0.0.1:8080/v1</code>.</p>
+
+    <h2>SDKs and platform tools</h2>
+    <p>OpenAI / Anthropic / LangChain / LlamaIndex drop-ins, plus OWASP LLM Top 10, SonarQube SARIF, GitHub Code Scanning, Semgrep, Prometheus, Grafana, and OpenTelemetry exports are documented in the <a href="integrations.html">integrations catalog</a>.</p>
+    <div class="terminal">
+      <div class="term-header">
+        <div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div>
+        <div class="term-title">bash</div>
+      </div>
+      <div class="term-body">
+<span class="token-cmd">cosen</span> integrate list
+<span class="token-cmd">cosen</span> export sarif --hours 24 --out reports/cosen-security.sarif
+<span class="token-cmd">cosen</span> export owasp --hours 24
+      </div>
+    </div>
   </main>
 
   <footer>
